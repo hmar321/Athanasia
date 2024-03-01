@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Athanasia.Models
 {
-    [Table("REVIEW")]
-    public class Review
+    [Table("VALORACION")]
+    public class Valoracion
     {
         [Key]
-        [Column("ID_REVIEW")]
-        public int IdReview { get; set; }
+        [Column("ID_VALORACION")]
+        public int IdValoracion { get; set; }
 
         [Column("ID_USUARIO")]
         public int IdUsuario { get; set; }

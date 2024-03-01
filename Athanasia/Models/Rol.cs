@@ -11,5 +11,7 @@ namespace Athanasia.Models
         public int IdRol { get; set; }
         [Column("NOMBRE")]
         public string Nombre { get; set; }
+        [Column("DESCRIPCION")]
+        public string Descripcion { get; set; }
     }
 }
