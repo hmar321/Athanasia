@@ -19,9 +19,6 @@ namespace Athanasia.Models
         [Column("FECHA_COMPRA")]
         public DateTime FechaCompra { get; set; }
 
-        [Column("VALORACION")]
-        public int Valoracion { get; set; }
-
         [Column("ID_ESTADO_LECTURA")]
         public int IdEstadoLectura { get; set; }
     }

@@ -8,6 +8,8 @@ namespace Athanasia.Models
     public class Libro
     {
         [Key]
+        [Column("ID_LIBRO")]
+        public int IdLibro { get; set; }
         [Column("ISBN")]
         public int Isbn { get; set; }
         [Column("TITULO")]
@@ -24,9 +26,7 @@ namespace Athanasia.Models
         public int IdAutor { get; set; }
         [Column("ID_EDITORIAL")]
         public int IdEditorial { get; set; }
+        [Column("ID_GENERO")]
+        public int IdGenero { get; set; }
     }
-
-    //[Column("ID_FORMATO")]
-    //public int IdFormato { get; set; }
-
 }

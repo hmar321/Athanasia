@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Athanasia.Models
 {
@@ -15,7 +16,7 @@ namespace Athanasia.Models
 
         [Column("APELLIDO")]
         public string Apellido { get; set; }
-
+        
         [Column("EMAIL")]
         public string Email { get; set; }
 
@@ -30,6 +31,10 @@ namespace Athanasia.Models
 
         [Column("ID_ROL")]
         public int IdRol { get; set; }
+
+        [Column("ID_ESTADO")]
+        public int IdEstado { get; set; }
+
     }
 
 }

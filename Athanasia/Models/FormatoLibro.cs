@@ -11,8 +11,8 @@ namespace Athanasia.Models
         public int IdFormatoLibro { get; set; }
         [Column("ID_FORMATO")]
         public int IdFormato { get; set; }
-        [Column("ISBN_LIBRO")]
-        public int IsbnLibro { get; set; }
+        [Column("ID_LIBRO")]
+        public int IdLibro { get; set; }
         [Column("PRECIO")]
         public double Precio { get; set; }
 

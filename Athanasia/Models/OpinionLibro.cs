@@ -16,12 +16,11 @@ namespace Athanasia.Models
         [Column("ID_USUARIO")]
         public int IdUsuario { get; set; }
 
-        [Column("ISBN_LIBRO")]
-        public int IsbnLibro { get; set; }
+        [Column("ID_LIBRO")]
+        public int IdLibro { get; set; }
 
         [Column("FECHA_AGREGADO")]
-        public int FechaAgregado { get; set; }
+        public DateTime FechaAgregado { get; set; }
 
-        
     }
 }
