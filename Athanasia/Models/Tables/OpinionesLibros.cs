@@ -1,26 +1,26 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Athanasia.Models
+namespace Athanasia.Models.Tables
 {
-    [Table("OPINION_LIBRO")]
-    public class OpinionLibro
+    [Table("OPINIONES_LIBROS")]
+    public class OpinionesLibros
     {
         [Key]
         [Column("ID_OPINION_LIBRO")]
         public int IdOpinionLibro { get; set; }
 
         [Column("ID_OPINION")]
-        public int IdOpinion { get; set; }
+        public int? IdOpinion { get; set; }
 
         [Column("ID_USUARIO")]
-        public int IdUsuario { get; set; }
+        public int? IdUsuario { get; set; }
 
         [Column("ID_LIBRO")]
-        public int IdLibro { get; set; }
+        public int? IdLibro { get; set; }
 
         [Column("FECHA_AGREGADO")]
-        public DateTime FechaAgregado { get; set; }
+        public DateTime? FechaAgregado { get; set; }
 
     }
 }

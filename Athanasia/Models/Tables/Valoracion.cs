@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Athanasia.Models
+namespace Athanasia.Models.Tables
 {
     [Table("VALORACION")]
     public class Valoracion

@@ -1,8 +1,20 @@
+using Athanasia.Data;
+using Athanasia.Repositories;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(10);
+});
+builder.Services.AddTransient<RepositoryAthanasia>();
+string connectionString = builder.Configuration.GetConnectionString("SqlServerAthanasia");
+builder.Services.AddDbContext<AthanasiaContext>(
+    options => options.UseSqlServer(connectionString)
+    );
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -19,9 +31,9 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
-
+app.UseSession();
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Libro}/{action=Index}/{id?}");
 
 app.Run();

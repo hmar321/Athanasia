@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Athanasia.Models
+namespace Athanasia.Models.Tables
 {
     [Table("ROL")]
     public class Rol
@@ -10,8 +10,8 @@ namespace Athanasia.Models
         [Column("ID_ROL")]
         public int IdRol { get; set; }
         [Column("NOMBRE")]
-        public string Nombre { get; set; }
+        public string? Nombre { get; set; }
         [Column("DESCRIPCION")]
-        public string Descripcion { get; set; }
+        public string? Descripcion { get; set; }
     }
 }

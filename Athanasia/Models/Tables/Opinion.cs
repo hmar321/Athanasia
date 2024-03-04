@@ -1,18 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Athanasia.Models
+namespace Athanasia.Models.Tables
 {
-    [Table("FORMATO")]
-    public class Formato
+    [Table("OPINION")]
+    public class Opinion
     {
         [Key]
-        [Column("ID_FORMATO")]
-        public int IdFormato { get; set; }
+        [Column("ID_OPINION")]
+        public int IdOpinion { get; set; }
         [Column("NOMBRE")]
         public string? Nombre { get; set; }
         [Column("DESCRIPCION")]
         public string? Descripcion { get; set; }
-
     }
 }

@@ -1,0 +1,20 @@
+﻿@model List<LibroView>
+<h1>Libros</h1>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Portada</th>
+            <th>Titulo</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(LibroView libro in Model)
+        {
+            <tr>
+                <td>@libro.Portada</td>
+                <td>@libro.Titulo</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<h2>@ViewData["MENSAJE"]</h2>

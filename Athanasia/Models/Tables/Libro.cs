@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace Athanasia.Models
+namespace Athanasia.Models.Tables
 {
     [Table("LIBRO")]
     public class Libro
