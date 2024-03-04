@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Athanasia.Models
 {
-    [Table("Categoria")]
+    [Table("CATEGORIA")]
     public class Categoria
     {
         [Key]
@@ -11,9 +11,9 @@ namespace Athanasia.Models
         public int IdCategoria { get; set; }
 
         [Column("NOMBRE")]
-        public string Nombre { get; set; }
+        public string? Nombre { get; set; }
 
         [Column("DESCRIPCION")]
-        public string Descripcion { get; set; }
+        public string? Descripcion { get; set; }
     }
 }

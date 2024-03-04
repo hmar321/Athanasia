@@ -11,12 +11,9 @@ namespace Athanasia.Models
         public int IdEditorial { get; set; }
 
         [Column("NOMBRE")]
-        public string Nombre { get; set; }
+        public string? Nombre { get; set; }
 
-        [Column("DESCRIPCION")]
-        public string Descripcion { get; set; }
-
-        [Column("WEB")]
-        public string Web { get; set; }
+        [Column("LOGO")]
+        public string? Logo { get; set; }
     }
 }
