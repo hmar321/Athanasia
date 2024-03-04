@@ -6,8 +6,8 @@ namespace Athanasia.Extension
     {
         public static string Normalizar(this string cadena)
         {
-            cadena=Regex.Replace(cadena, @"[^a-zA-Z0-9\s]", string.Empty).ToLower();
-            return cadena;
+            string limpio=Regex.Replace(cadena, @"[^a-zA-Z0-9\s]", string.Empty).ToLower();
+            return limpio;
         }
     }
 }
