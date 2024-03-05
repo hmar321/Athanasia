@@ -23,7 +23,7 @@ namespace Athanasia.Controllers
         public async Task<ActionResult> Index(string buscador)
         {
             List<LibroView> libros = await this.repo.GetLibrosViewAsync();
-            ViewData["MENSAJE"] = buscador.Normalizar();
+            ViewData["MENSAJE"] = buscador.Limpiar();
             Console.WriteLine(buscador);
             string hola = buscador;
             string hola2 = buscador;

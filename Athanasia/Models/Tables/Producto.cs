@@ -19,6 +19,8 @@ namespace Athanasia.Models.Tables
         public int? IdFormato { get; set; }
         [Column("ID_LIBRO")]
         public int? IdLibro { get; set; }
+        [Column("ID_EDITORIAL")]
+        public int? IdEditorial { get; set; }
 
     }
 }

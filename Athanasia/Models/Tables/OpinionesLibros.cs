@@ -19,8 +19,5 @@ namespace Athanasia.Models.Tables
         [Column("ID_LIBRO")]
         public int? IdLibro { get; set; }
 
-        [Column("FECHA_AGREGADO")]
-        public DateTime? FechaAgregado { get; set; }
-
     }
 }

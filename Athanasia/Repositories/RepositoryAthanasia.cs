@@ -6,8 +6,9 @@ using Microsoft.EntityFrameworkCore;
 #region VIEWS
 //create view V_LIBRO
 //as
-//select 
-//	ISNULL(l.ID_LIBRO,-1) ID_LIBRO,
+//select
+
+//    ISNULL(l.ID_LIBRO, -1) ID_LIBRO,
 //    ISNULL(l.TITULO, 'Sin título') TITULO,
 //    ISNULL(l.SINOPSIS, 'Sin sinopsis') SINOPSIS,
 //    ISNULL(l.FECHA_PUBLICACION, '1-01-01') FECHA_PUBLICACION,

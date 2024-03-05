@@ -9,18 +9,16 @@ namespace Athanasia.Models.Tables
         [Key]
         [Column("ID_VALORACION")]
         public int IdValoracion { get; set; }
-
-        [Column("ID_USUARIO")]
-        public int IdUsuario { get; set; }
-
-        [Column("ID_LIBRO")]
-        public int IdLibro { get; set; }
-
         [Column("PUNTUACION")]
-        public int Puntuacion { get; set; }
-
+        public int? Puntuacion { get; set; }
         [Column("COMENTARIO")]
-        public string Comentario { get; set; }
+        public string? Comentario { get; set; }
+        [Column("FECHA_COMENTARIO")]
+        public DateTime? FechaComentario { get; set; }
+        [Column("ID_USUARIO")]
+        public int? IdUsuario { get; set; }
+        [Column("ID_PRODUCTO")]
+        public int? IdProducto { get; set; }
 
     }
 }
