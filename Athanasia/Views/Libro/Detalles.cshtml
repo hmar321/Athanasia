@@ -1,0 +1,35 @@
+﻿@model ProductoView
+@if (Model==null)
+{
+    <h2 class="text-danger">No se ha encontrado el libro</h2>
+}
+else
+{
+    <div class="col-3">
+        <h1 class="text-primary">@Model.Autor</h1>
+        <div class="card" style="width:18rem">
+            <img src="~/images/portadas/ElCaminoDeLosReyes.png" style="height:30rem;width:22rem;">
+        </div>
+    </div>
+    <div class="col-3" style="border:1px solid;margin-top:3.5rem">
+        <h1 class="text-primary">@Model.Titulo</h1>
+        <p>@Model.Sinopsis</p>
+    </div>
+    <div class="col-1"></div>
+    <div class="col-3" style="border:1px solid;margin-top:3.5rem">
+        <ul class="list-group">
+            <li class="list-group-item">
+                ISBN: @Model.Isbn
+            </li>
+            <li class="list-group-item">
+                Formato: @Model.Formato
+            </li>
+            <li class="list-group-item">
+                Precio : @Model.Precio €
+            </li>
+            <li class="list-group-item">
+                Generos : @Model.Generos
+            </li>
+        </ul>
+    </div>
+}

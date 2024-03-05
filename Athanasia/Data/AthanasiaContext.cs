@@ -26,6 +26,6 @@ namespace Athanasia.Data
         public DbSet<Saga> Sagas { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Valoracion> Valoraciones { get; set; }
-        public DbSet<LibroView> LibrosView { get; set; }
+        public DbSet<ProductoView> ProductosView { get; set; }
     }
 }

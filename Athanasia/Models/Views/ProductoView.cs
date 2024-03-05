@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Athanasia.Models.Views
 {
-    [Table("V_LIBRO")]
-    public class LibroView
+    [Table("V_PRODUCTO")]
+    public class ProductoView
     {
         [Key]
-        [Column("ID_LIBRO")]
-        public int IdLibro { get; set; }
+        [Column("ID_PRODUCTO")]
+        public int IdProducto { get; set; }
         [Column("TITULO")]
         public string? Titulo { get; set; }
         [Column("SINOPSIS")]
@@ -25,5 +25,15 @@ namespace Athanasia.Models.Views
         public string? Generos { get; set; }
         [Column("SAGA")]
         public string? Saga { get; set; }
+        [Column("ISBN")]
+        public string? Isbn { get; set; }
+        [Column("FORMATO")]
+        public string? Formato { get; set; }
+        [Column("PRECIO")]
+        public double? Precio { get; set; }
+        [Column("EDITORIAL")]
+        public string? Editorial { get; set; }
+        [Column("LOGO")]
+        public string? Logo { get; set; }
     }
 }

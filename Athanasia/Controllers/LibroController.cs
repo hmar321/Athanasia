@@ -16,18 +16,20 @@ namespace Athanasia.Controllers
 
         public async Task<ActionResult> Index()
         {
-            List<LibroView> libros =await this.repo.GetLibrosViewAsync();
+            List<ProductoView> libros =await this.repo.GetProductosViewAsync();
             return View(libros);
         }
         [HttpPost]
         public async Task<ActionResult> Index(string buscador)
         {
-            List<LibroView> libros = await this.repo.GetLibrosViewAsync();
-            ViewData["MENSAJE"] = buscador.Limpiar();
-            Console.WriteLine(buscador);
-            string hola = buscador;
-            string hola2 = buscador;
+            List<ProductoView> libros = await this.repo.GetProductosViewAsync();
             return View(libros);
+        }
+
+        public async Task<ActionResult> Detalles(int idproducto)
+        {
+            ProductoView libro = await this.repo.FindProductoAsync(idproducto);
+            return View(libro);
         }
     }
 }
