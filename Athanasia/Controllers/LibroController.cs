@@ -1,4 +1,5 @@
 ﻿using Athanasia.Extension;
+using Athanasia.Helpers;
 using Athanasia.Models.Views;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -16,13 +17,13 @@ namespace Athanasia.Controllers
 
         public async Task<ActionResult> Index()
         {
-            List<ProductoView> libros =await this.repo.GetProductosViewAsync();
+            List<ProductoView> libros =await this.repo.GetProductosViewByFormatoAsync(Formatos.TapaBlanda);
             return View(libros);
         }
         [HttpPost]
         public async Task<ActionResult> Index(string buscador)
         {
-            List<ProductoView> libros = await this.repo.GetProductosViewAsync();
+            List<ProductoView> libros = await this.repo.GetProductosViewByFormatoAsync(Formatos.TapaBlanda);
             return View(libros);
         }
 

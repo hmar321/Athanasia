@@ -1,4 +1,5 @@
 ﻿using Athanasia.Data;
+using Athanasia.Helpers;
 using Athanasia.Models.Views;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
@@ -48,9 +49,15 @@ namespace Athanasia.Repositories
             return await this.context.ProductosView.ToListAsync();
         }
 
+        public async Task<List<ProductoView>> GetProductosViewByFormatoAsync(Formatos formato)
+        {
+            string dato = HelperFormatos.GetFormato(formato);
+            return await this.context.ProductosView.Where(o => o.Formato == dato).ToListAsync();
+        }
+
         public async Task<ProductoView> FindProductoAsync(int idproducto)
         {
-            return await this.context.ProductosView.FirstOrDefaultAsync(p=>p.IdProducto==idproducto);
+            return await this.context.ProductosView.FirstOrDefaultAsync(p => p.IdProducto == idproducto);
         }
         #endregion
     }
