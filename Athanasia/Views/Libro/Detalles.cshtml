@@ -1,35 +1,58 @@
 ﻿@model ProductoView
-@if (Model==null)
-{
-    <h2 class="text-danger">No se ha encontrado el libro</h2>
+@{
+    List<string> generos = ViewData["GENEROS"] as List<string>;
 }
-else
-{
-    <div class="col-3">
-        <h1 class="text-primary">@Model.Autor</h1>
-        <div class="card" style="width:18rem">
-            <img src="~/images/portadas/ElCaminoDeLosReyes.png" style="height:30rem;width:22rem;">
-        </div>
-    </div>
-    <div class="col-3" style="border:1px solid;margin-top:3.5rem">
-        <h1 class="text-primary">@Model.Titulo</h1>
-        <p>@Model.Sinopsis</p>
-    </div>
-    <div class="col-1"></div>
-    <div class="col-3" style="border:1px solid;margin-top:3.5rem">
-        <ul class="list-group">
-            <li class="list-group-item">
-                ISBN: @Model.Isbn
-            </li>
-            <li class="list-group-item">
-                Formato: @Model.Formato
-            </li>
-            <li class="list-group-item">
-                Precio : @Model.Precio €
-            </li>
-            <li class="list-group-item">
-                Generos : @Model.Generos
-            </li>
-        </ul>
-    </div>
+@section styles {
+    <link rel="stylesheet" href="~/css/LibroDetalles.css" />
 }
+<div class="col-12 d-flex justify-content-center">
+    <div class="row tarjeta">
+        @if (Model == null)
+        {
+            <h2 class="text-danger">No se ha encontrado el libro</h2>
+        }
+        else
+        {
+            <div class="col-4">
+                <img src="~/images/portadas/ElCaminoDeLosReyes.png" class="rounded imglibro">
+            </div>
+            <div class="col-5" style="padding-top:1.5rem">
+                <h1 class="text-primary">@Model.Titulo</h1>
+                <h5 class="text-light">Autor: @Model.Autor</h5>
+                <p class="text-light" style="text-align:justify">@Model.Sinopsis</p>
+            </div>
+            <div class="col-3" style="padding-left:3.5rem">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        ISBN:
+                        <h6>@Model.Isbn</h6>
+                    </li>
+                    <li class="list-group-item">
+                        Formato:
+                        <h6>@Model.Formato</h6>
+                    </li>
+                    <li class="list-group-item">
+                        Precio :
+                        <h6>@Model.Precio€</h6>
+                    </li>
+                    <li class="list-group-item">
+                        Generos:
+                        @if (generos == null)
+                        {
+                            <span>Sin generos</span>
+                        }
+                        else
+                        {
+                            <div class="d-flex flex-wrap gap-1">
+                                @foreach (string genero in generos)
+                                {
+                                    <button class="btn btn-primary btn-sm"> @genero</button>
+                                }
+                            </div>
+                        }
+                    </li>
+                </ul>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,17 @@
+﻿.tarjeta {
+    background-color: rgb(20, 60, 100);
+    min-height: 30vh;
+    width: 110rem;
+    max-width: 98vw;
+    border-radius: 5px;
+    min-height:65vh;
+    padding:2rem;
+}
+
+.imglibro {
+    padding-left:2rem;
+    height: 35vw;
+    min-height:2rem;
+    width: 26vw;
+    min-width:1rem;
+}

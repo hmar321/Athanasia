@@ -20,5 +20,23 @@
             }
             return dato;
         }
+
+        public static int GetFormatoId(Formatos formato)
+        {
+            int dato = -1;
+            switch (formato)
+            {
+                case Formatos.TapaDura:
+                    dato = 1;
+                    break;
+                case Formatos.TapaBlanda:
+                    dato = 2;
+                    break;
+                case Formatos.Ebook:
+                    dato = 3;
+                    break;
+            }
+            return dato;
+        }
     }
 }

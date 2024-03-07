@@ -1,14 +1,17 @@
-﻿@model List<ProductoView>
+﻿@model List<ProductoSimpleView>
 <h2>@ViewData["MENSAJE"]</h2>
 <div class="col-1"></div>
 <div class="col-10 d-flex flex-wrap gap-5">
-    @foreach (ProductoView libro in Model)
+    @foreach (ProductoSimpleView libro in Model)
     {
         <div class="card" style="width:18rem">
             <img src="~/images/portadas/ElCaminoDeLosReyes.png" class="card-img-top" style="height:20rem">
             <div class="card-body d-flex flex-column" style="height:9rem">
                 <h5 class="card-title">@libro.Titulo</h5>
-                <h6 class="card-subtitle text-muted">@libro.Autor</h6>
+                <div class="d-flex justify-content-between mt-auto">
+                    <h6 class="card-subtitle text-muted">@libro.Autor</h6>
+                    <h6 class="card-subtitle">@libro.Precio€</h6>
+                </div>
                 <div class="d-flex justify-content-between mt-auto">
                     <button class="btn btn-success d-flex flex-column justify-content-center align-items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="currentColor" class="bi bi-cart4" viewBox="0 0 16 16">
