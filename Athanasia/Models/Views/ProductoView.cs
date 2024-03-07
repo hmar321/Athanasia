@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Athanasia.Extension;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Athanasia.Models.Views
@@ -35,5 +36,7 @@ namespace Athanasia.Models.Views
         public string? Editorial { get; set; }
         [Column("LOGO")]
         public string? Logo { get; set; }
+
+        
     }
 }

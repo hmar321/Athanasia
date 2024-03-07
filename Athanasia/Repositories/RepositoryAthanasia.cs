@@ -1,4 +1,5 @@
 ﻿using Athanasia.Data;
+using Athanasia.Extension;
 using Athanasia.Helpers;
 using Athanasia.Models.Views;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -92,6 +93,17 @@ namespace Athanasia.Repositories
             List<ProductoSimpleView> productosSimples = await this.context.ProductosSimplesView.Where(o => o.IdFormato == idFormato).ToListAsync();
             return productosSimples;
         }
+
+        public async Task<List<ProductoSimpleView>> SearchProductosSimplesViewAsync(string palabra, int idformato)
+        {
+            string limpio = palabra.Limpiar();
+            var consulta = from datos in this.context.ProductosSimplesView
+                           where (datos.Titulo.Contains(limpio) || datos.Autor.Limpiar().Contains(limpio))
+                           && datos.IdFormato == idformato
+                           select datos;
+            return await consulta.ToListAsync();
+        }
+
         #endregion
 
         #region

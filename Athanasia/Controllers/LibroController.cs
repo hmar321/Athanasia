@@ -17,15 +17,15 @@ namespace Athanasia.Controllers
 
         public async Task<ActionResult> Index()
         {
-            int idFormato = HelperFormatos.GetFormatoId(Formatos.TapaDura);
-            List <ProductoSimpleView> libros =await this.repo.GetAllProductoSimpleViewByIdFormatoAsync(idFormato);
+            int idformato = HelperFormatos.GetFormatoId(Formatos.TapaDura);
+            List <ProductoSimpleView> libros =await this.repo.GetAllProductoSimpleViewByIdFormatoAsync(idformato);
             return View(libros);
         }
         [HttpPost]
         public async Task<ActionResult> Index(string buscador)
         {
-            int idFormato = HelperFormatos.GetFormatoId(Formatos.TapaDura);
-            List<ProductoSimpleView> libros = await this.repo.GetAllProductoSimpleViewByIdFormatoAsync(idFormato);
+            int idformato = HelperFormatos.GetFormatoId(Formatos.TapaDura);
+            List<ProductoSimpleView> libros = await this.repo.SearchProductosSimplesViewAsync(buscador,idformato);
             return View(libros);
         }
 
