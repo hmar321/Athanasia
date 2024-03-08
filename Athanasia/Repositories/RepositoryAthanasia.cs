@@ -95,14 +95,34 @@ using Microsoft.EntityFrameworkCore;
 
 #region PROCEDURES
 
-//create procedure SP_SEARCH_PRODUCTOS
-//(@busqueda nvarchar(255), @idformato int)
+//alter procedure SP_SEARCH_PRODUCTOS
+//(@busqueda nvarchar(255))
 //as
-//	select ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO from V_PRODUCTO_SIMPLE
-//	where TITULO is not null
-//	and AUTOR is not null
-//	and dbo.LIMPIAR(TITULO) like @busqueda
-//	and ID_FORMATO=@idformato
+//SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO
+//FROM (
+//	SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO,
+//           ROW_NUMBER() OVER(PARTITION BY TITULO ORDER BY ID_PRODUCTO) AS REPETICION
+//    FROM V_PRODUCTO_SIMPLE) PRODUCTOS
+//WHERE REPETICION = 1
+//and TITULO is not null
+//and AUTOR is not null
+//and dbo.LIMPIAR(TITULO) like @busqueda
+//or dbo.LIMPIAR(AUTOR) like @busqueda
+//and REPETICION = 1
+//order by ID_PRODUCTO
+//go
+
+//create procedure SP_PRODUCTOS
+//as
+//SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO
+//FROM (
+//	SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO,
+//           ROW_NUMBER() OVER(PARTITION BY TITULO ORDER BY ID_PRODUCTO) AS REPETICION
+//    FROM V_PRODUCTO_SIMPLE) PRODUCTOS
+//WHERE REPETICION = 1
+//and TITULO is not null
+//and AUTOR is not null
+//order by ID_PRODUCTO
 //go
 
 #endregion
@@ -149,20 +169,28 @@ namespace Athanasia.Repositories
             return productosSimples;
         }
 
-        public async Task<List<ProductoSimpleView>> GetlProductoSimplesViewAsync(int idFormato)
+        public async Task<List<ProductoSimpleView>> GetProductoSimplesViewAsync()
         {
-            List<ProductoSimpleView> productosSimples = await this.context.ProductosSimplesView.Where(o => o.IdFormato == idFormato).ToListAsync();
-            return productosSimples;
+            string sql = "SP_PRODUCTOS";
+            var consulta = this.context.ProductosSimplesView.FromSqlRaw(sql);
+            return await consulta.ToListAsync();
         }
 
-        public async Task<List<ProductoSimpleView>> FindProductosSimplesViewAsync(string palabra, int idformato)
+        public async Task<List<ProductoSimpleView>> FindProductosSimplesViewAsync(string palabra)
         {
-            string busqueda = palabra.Limpiar();
-            string sql = "SP_SEARCH_PRODUCTOS @busqueda,@idformato";
-            SqlParameter parambusqueda = new SqlParameter("@busqueda", "%" + busqueda + "%");
-            SqlParameter paramidformato = new SqlParameter("@idformato", idformato);
-            var consulta = this.context.ProductosSimplesView.FromSqlRaw(sql, parambusqueda, paramidformato);
-            return await consulta.ToListAsync();
+            if (palabra == null)
+            {
+                return await this.GetProductoSimplesViewAsync();
+            }
+            else
+            {
+
+                string busqueda = palabra.Limpiar();
+                string sql = "SP_SEARCH_PRODUCTOS @busqueda";
+                SqlParameter parambusqueda = new SqlParameter("@busqueda", "%" + busqueda + "%");
+                var consulta = this.context.ProductosSimplesView.FromSqlRaw(sql, parambusqueda);
+                return await consulta.ToListAsync();
+            }
         }
 
         public async Task<List<ProductoSimpleView>> FindProductosSimplesViewByIds(List<int> idsproductos)

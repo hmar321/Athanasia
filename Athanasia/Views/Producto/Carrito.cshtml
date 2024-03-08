@@ -1,4 +1,7 @@
 ﻿@model List<ProductoSimpleView>
+@{
+    double total = 0;
+}
 <div class="col-1"></div>
 <div class="col-10">
     <h1 class="text-primary">Carrito</h1>
@@ -12,17 +15,33 @@
             <thead>
                 <tr>
                     <th>Productos</th>
+                    <th>Precio</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (ProductoSimpleView producto in Model)
                 {
+                    total += producto.Precio;
                     <tr>
                         <td>
-                            <img src="~/images/portadas/@producto.Portada" class="rounded" style="height:20rem;width:13rem;">
+                            <div class="d-flex flex-wrap">
+                                <img src="~/images/portadas/@producto.Portada" class="rounded" style="height:20rem;width:13rem;">
+
+                                <div class="d-flex flex-column gap-3 m-4">
+                                    <h4>@producto.Titulo</h4>
+                                    <h5>@producto.Autor</h5>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            @producto.Precio€
                         </td>
                     </tr>
                 }
+                <tr>
+                    <td></td>
+                    <td><h5>Subtotal (@Model.Count producto): @total€</h5></td>
+                </tr>
             </tbody>
         </table>
     }

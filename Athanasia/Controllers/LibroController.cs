@@ -17,7 +17,7 @@ namespace Athanasia.Controllers
             this.repo = repo;
             this.memoryCache = memoryCache;
         }
-
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Client)]
         public async Task<ActionResult> Index(int? idproducto)
         {
             List<int> idsproducto = this.memoryCache.Get<List<int>>("CARRITO");
@@ -27,21 +27,19 @@ namespace Athanasia.Controllers
                 {
                     idsproducto = new List<int>();
                 }
-                if (idsproducto.Any(id => id == idproducto.Value)==false)
+                if (idsproducto.Any(id => id == idproducto.Value) == false)
                 {
                     idsproducto.Add(idproducto.Value);
                     this.memoryCache.Set("CARRITO", idsproducto);
                 }
             }
-            int idformato = HelperFormatos.GetFormatoId(Formatos.TapaBlanda);
-            List<ProductoSimpleView> libros = await this.repo.GetlProductoSimplesViewAsync(idformato);
+            List<ProductoSimpleView> libros = await this.repo.GetProductoSimplesViewAsync();
             return View(libros);
         }
         [HttpPost]
         public async Task<ActionResult> Index(string buscador)
         {
-            int idformato = HelperFormatos.GetFormatoId(Formatos.TapaBlanda);
-            List<ProductoSimpleView> libros = await this.repo.FindProductosSimplesViewAsync(buscador, idformato);
+            List<ProductoSimpleView> libros = await this.repo.FindProductosSimplesViewAsync(buscador);
             return View(libros);
         }
 
