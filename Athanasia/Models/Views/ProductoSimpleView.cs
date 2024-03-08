@@ -11,14 +11,14 @@ namespace Athanasia.Models.Views
         [Column("ID_PRODUCTO")]
         public int IdProducto { get; set; }
         [Column("TITULO")]
-        public string? Titulo { get; set; }
+        public string Titulo { get; set; }
         [Column("PORTADA")]
         public string? Portada { get; set; }
         [Column("AUTOR")]
-        public string? Autor { get; set; }
+        public string Autor { get; set; }
         [Column("PRECIO")]
-        public double? Precio { get; set; }
+        public double Precio { get; set; }
         [Column("ID_FORMATO")]
-        public int? IdFormato { get; set; }
+        public int IdFormato { get; set; }
     }
 }

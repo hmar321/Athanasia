@@ -5,23 +5,24 @@
 @section styles {
     <link rel="stylesheet" href="~/css/LibroDetalles.css" />
 }
-<div class="col-12 d-flex justify-content-center">
-    <div class="row tarjeta">
-        @if (Model == null)
-        {
-            <h2 class="text-danger">No se ha encontrado el libro</h2>
-        }
-        else
-        {
-            <div class="col-4">
-                <img src="~/images/portadas/ElCaminoDeLosReyes.png" class="rounded imglibro">
+<div class="col-12 d-flex flex-column align-items-center">
+
+    @if (Model == null)
+    {
+        <h2 class="text-danger">No se ha encontrado el libro</h2>
+    }
+    else
+    {
+        <div class="contenedor-producto">
+            <div class="seccion-portada">
+                <img src="~/images/portadas/@Model.Portada" class="rounded imglibro">
             </div>
-            <div class="col-5" style="padding-top:1.5rem">
+            <div class="seccion-sinopsis" style="padding-top:1.5rem">
                 <h1 class="text-primary">@Model.Titulo</h1>
                 <h5 class="text-light">Autor: @Model.Autor</h5>
                 <p class="text-light" style="text-align:justify">@Model.Sinopsis</p>
             </div>
-            <div class="col-3" style="padding-left:3.5rem">
+            <div class="seccion-info">
                 <ul class="list-group">
                     <li class="list-group-item">
                         ISBN:
@@ -35,6 +36,13 @@
                         Precio :
                         <h6>@Model.Precio€</h6>
                     </li>
+                    @if (Model.Saga != null)
+                    {
+                        <li class="list-group-item">
+                            Saga :
+                            <h6>@Model.Saga</h6>
+                        </li>
+                    }
                     <li class="list-group-item">
                         Generos:
                         @if (generos == null)
@@ -53,6 +61,9 @@
                     </li>
                 </ul>
             </div>
-        }
-    </div>
+        </div>
+        <div>
+            Comentarios
+        </div>
+    }
 </div>

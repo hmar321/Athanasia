@@ -1,17 +1,31 @@
-﻿.tarjeta {
-    background-color: rgb(20, 60, 100);
+﻿.contenedor-producto {
+    background-color: rgb(50, 50, 50);
     min-height: 30vh;
     width: 110rem;
     max-width: 98vw;
     border-radius: 5px;
-    min-height:65vh;
-    padding:2rem;
+    min-height: 65vh;
+    padding: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .imglibro {
-    padding-left:2rem;
-    height: 35vw;
-    min-height:2rem;
-    width: 26vw;
-    min-width:1rem;
+    height: 35rem;
+    width: 25rem;
+}
+.seccion-portada {
+    width: 25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.seccion-sinopsis {
+    max-width: 48rem;
+    padding:1rem;
+}
+.seccion-info {
+    width:16vw;
+    min-width:12rem;
 }

@@ -11,7 +11,7 @@ namespace Athanasia.Models.Views
         [Column("ID_PRODUCTO")]
         public int IdProducto { get; set; }
         [Column("TITULO")]
-        public string? Titulo { get; set; }
+        public string Titulo { get; set; }
         [Column("SINOPSIS")]
         public string? Sinopsis { get; set; }
         [Column("FECHA_PUBLICACION")]
@@ -21,17 +21,17 @@ namespace Athanasia.Models.Views
         [Column("CATEGORIA")]
         public string? Categoria { get; set; }
         [Column("AUTOR")]
-        public string? Autor { get; set; }
+        public string Autor { get; set; }
         [Column("GENEROS")]
         public string? Generos { get; set; }
         [Column("SAGA")]
         public string? Saga { get; set; }
         [Column("ISBN")]
-        public string? Isbn { get; set; }
+        public string Isbn { get; set; }
         [Column("FORMATO")]
-        public string? Formato { get; set; }
+        public string Formato { get; set; }
         [Column("PRECIO")]
-        public double? Precio { get; set; }
+        public double Precio { get; set; }
         [Column("EDITORIAL")]
         public string? Editorial { get; set; }
         [Column("LOGO")]

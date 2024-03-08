@@ -17,8 +17,6 @@ namespace Athanasia.Models.Tables
         public DateTime? FechaComentario { get; set; }
         [Column("ID_USUARIO")]
         public int? IdUsuario { get; set; }
-        [Column("ID_PRODUCTO")]
-        public int? IdProducto { get; set; }
 
     }
 }

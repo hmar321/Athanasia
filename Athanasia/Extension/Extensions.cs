@@ -20,8 +20,8 @@ namespace Athanasia.Extension
                   .Replace("ö", "o")
                   .Replace("ü", "u")
                   .Replace("ß", "ss")
-                  .Replace(" ", "");
-            limpio = Regex.Replace(limpio, @"[^a-zA-Z0-9\s]", "");
+                  .Replace(" ", "").ToUpper();
+            limpio = Regex.Replace(limpio, @"[^A-Z0-9\s]", "");
             return limpio;
         }
     }
