@@ -4,18 +4,30 @@
 }
 <div class="col-1"></div>
 <div class="col-10">
-    <h1 class="text-primary">Carrito</h1>
     @if (Model == null)
     {
-        <h3 class="text-secondary">No tienes nada en el carrito</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th><h4>Productos</h4></th>
+                    <th><h5>Precio</h5></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><h6>No tienes productos en el carrito</h6></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
     }
     else
     {
         <table class="table">
             <thead>
                 <tr>
-                    <th>Productos</th>
-                    <th>Precio</th>
+                    <th><h4>Productos</h4></th>
+                    <th><h5>Precio</h5></th>
                 </tr>
             </thead>
             <tbody>
@@ -44,5 +56,6 @@
                 </tr>
             </tbody>
         </table>
+        <span>hola</span>
     }
 </div>

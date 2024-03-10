@@ -4,14 +4,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Athanasia</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Athanasia.styles.css" asp-append-version="true" />
+    <style>
+        body{
+            background-color:rgb(80,80,80);
+        }
+    </style>
     @await RenderSectionAsync("styles", required: false)
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow" style="min-height:8vh;">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark box-shadow" style="min-height:8vh;">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Libro" asp-action="Index">Athanasia</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -20,14 +25,8 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-evenly">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Libro" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Producto" asp-action="Carrito">Carrito</a>
-                        </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link text-light dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
                                     <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
                                     <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
@@ -43,25 +42,29 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-controller="Libro" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-controller="Producto" asp-action="Carrito">Carrito</a>
+                        </li>
+                        
                     </ul>
-
-
                     <form asp-controller="Libro" asp-action="Index" method="post" class="d-flex gap-2">
                         <input type="text" name="buscador" class="form-control" />
                         <button class="btn btn-primary">Buscar</button>
                     </form>
-
                 </div>
             </div>
         </nav>
     </header>
     <div class="container-fluid">
-        <div class="row" style="min-height:85.3vh;">
+        <div class="row" style="min-height:85.5vh;">
             @RenderBody()
         </div>
     </div>
 
-    <footer class="border-top footer text-muted" style="min-height:6vh;">
+    <footer class="footer bg-dark text-muted" style="min-height:6vh;">
         <div class="container">
             &copy; 2024 - Athanasia - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
@@ -69,6 +72,11 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+
+        })
+    </script>
     @await RenderSectionAsync("scripts", required: false)
 </body>
 </html>

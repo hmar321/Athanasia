@@ -1,5 +1,6 @@
 ﻿using Athanasia.Extension;
 using Athanasia.Helpers;
+using Athanasia.Models.Tables;
 using Athanasia.Models.Views;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -18,21 +19,8 @@ namespace Athanasia.Controllers
             this.memoryCache = memoryCache;
         }
         [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Client)]
-        public async Task<ActionResult> Index(int? idproducto)
+        public async Task<ActionResult> Index()
         {
-            List<int> idsproducto = this.memoryCache.Get<List<int>>("CARRITO");
-            if (idproducto != null)
-            {
-                if (idsproducto == null)
-                {
-                    idsproducto = new List<int>();
-                }
-                if (idsproducto.Any(id => id == idproducto.Value) == false)
-                {
-                    idsproducto.Add(idproducto.Value);
-                    this.memoryCache.Set("CARRITO", idsproducto);
-                }
-            }
             List<ProductoSimpleView> libros = await this.repo.GetProductoSimplesViewAsync();
             return View(libros);
         }
@@ -49,5 +37,25 @@ namespace Athanasia.Controllers
             ViewData["GENEROS"] = libro.Generos.Split(", ").ToList();
             return View(libro);
         }
+
+        public IActionResult _IconoCarrito(int idproducto, bool agregar)
+        {
+            List<int> idsproducto = this.memoryCache.Get<List<int>>("CARRITO");
+            if (agregar == true)
+            {
+                if (idsproducto == null)
+                {
+                    idsproducto = new List<int>();
+                }
+                if (idsproducto.Any(id => id == idproducto) == false)
+                {
+                    idsproducto.Add(idproducto);
+                    this.memoryCache.Set("CARRITO", idsproducto);
+                }
+            }
+            ViewData["IDPRODUCTO"] = idproducto;
+            return PartialView("_IconoCarrito");
+        }
+
     }
 }
