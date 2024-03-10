@@ -1,4 +1,5 @@
 using Athanasia.Data;
+using Athanasia.Helpers;
 using Athanasia.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,6 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddTransient<HelperPathProvider>();
+builder.Services.AddTransient<HelperMails>();
+builder.Services.AddMemoryCache();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {

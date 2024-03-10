@@ -1,6 +1,10 @@
-﻿using Athanasia.Repositories;
+﻿using Athanasia.Extension;
+using Athanasia.Helpers;
+using Athanasia.Models.Tables;
+using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Athanasia.Controllers
 {
@@ -8,28 +12,79 @@ namespace Athanasia.Controllers
     {
         private RepositoryAthanasia repo;
         private IMemoryCache memoryCache;
+        private HelperMails helperMail;
+        private HelperPathProvider helperPathProvider;
 
-        public UsuarioController(RepositoryAthanasia repo, IMemoryCache memoryCache)
+        public UsuarioController(RepositoryAthanasia repo, IMemoryCache memoryCache, HelperMails helperMail, HelperPathProvider helperPathProvider)
         {
             this.repo = repo;
             this.memoryCache = memoryCache;
+            this.helperMail = helperMail;
+            this.helperPathProvider = helperPathProvider;
         }
+
         public IActionResult Terminos()
         {
             return View();
         }
-        public IActionResult Login()
+        public async Task<IActionResult> Login(string? token)
         {
+            if (token != null)
+            {
+                await this.repo.ActivarUsuarioAsync(token);
+                ViewData["MENSAJE"] = "Cuenta activada correctamente";
+            }
             return View();
         }
+        [HttpPost]
+        public async Task<IActionResult> Login(string email, string password)
+        {
+
+            Usuario usuario = await this.repo.LogInUserAsync(email, password);
+            if (usuario == null)
+            {
+                ViewData["ERROR"] = "Credenciales incorrectas";
+                return View();
+            }
+            else
+            {
+                HttpContext.Session.SetObject("USUARIO", usuario);
+                return RedirectToAction("Index", "Libro");
+            }
+        }
+
         public IActionResult Registro()
         {
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Registro(string nombre,string apellido,string email,string password,string password2,bool terminos)
+        public async Task<IActionResult> Registro(string nombre, string apellido, string email, string password, string password2, bool terminos)
         {
+            Usuario usuario = await this.repo.RegistrarUsuarioAsync(nombre, apellido, email, password);
+            string serverUrl = this.helperPathProvider.MapUrlServerPath();
+            serverUrl = serverUrl + "/Usuario/Login?token=" + usuario.Token;
+            string mensaje = "<h3>Usuario registrado<h3>";
+            mensaje += "<p>Puede activar su cuenta pulsando el siguiente enlace:</p>";
+            mensaje += "<a href='" + serverUrl + "'>" + serverUrl + "</a>";
+            mensaje += "<p>Bienvenido</p>";
+            await this.helperMail.SendMailAsync(email, "Activación cuenta[NO REPLY]", mensaje);
+            ViewData["MENSAJE"] = "Usuario registrado correctamente, activa tu cuenta desde tu correo";
+            return View();
+        }
 
+        public IActionResult _Menus()
+        {
+            return PartialView("_Menus");
+        }
+
+        public IActionResult CerrarSesion()
+        {
+            HttpContext.Session.Remove("USUARIO");
+            return RedirectToAction("Index", "Libro");
+        }
+
+        public IActionResult Perfil()
+        {
             return View();
         }
     }

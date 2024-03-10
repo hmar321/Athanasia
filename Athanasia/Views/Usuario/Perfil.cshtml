@@ -1,0 +1,37 @@
+﻿@{
+    Usuario usuario = Context.Session.GetObject<Usuario>("USUARIO");
+}
+
+<h1 class="text-light">Perfil</h1>
+
+<div>
+    <h4 class="text-light">Usuario</h4>
+    <hr class="text-light" />
+    <dl class="row">
+        <dt class="col-sm-2 text-light">
+            Nombre
+        </dt>
+        <dd class="col-sm-10 text-light">
+            @usuario.Nombre
+        </dd>
+        <dt class="col-sm-2 text-light">
+            Apellido
+        </dt>
+        <dd class="col-sm-10 text-light">
+            @usuario.Apellido
+        </dd>
+        <dt class="col-sm-2 text-light">
+            Email
+        </dt>
+        <dd class="col-sm-10 text-light">
+            @usuario.Email
+        </dd>
+
+        <dt class="col-sm-2 text-light">
+            Imagen
+        </dt>
+        <dd class="col-sm-10 text-light">
+            @usuario.Imagen
+        </dd>
+    </dl>
+</div>

@@ -4,33 +4,29 @@
 }
 <div class="col-1"></div>
 <div class="col-10">
+    <table class="table table-light">
+        <thead>
+            <tr>
+                <th style="border-radius:0.35rem 0 0 0;">
+                    <h4>Productos</h4>
+                </th>
+                <th style="border-radius: 0 0.35rem 0 0;">
+                    <h5>Precio</h5>
+                </th>
+            </tr>
+        </thead>
     @if (Model == null)
     {
-        <table class="table">
-            <thead>
+       
                 <tr>
-                    <th><h4>Productos</h4></th>
-                    <th><h5>Precio</h5></th>
+                    <td colspan="2" class="p-4">
+                        <h6>No tienes productos en el carrito</h6>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><h6>No tienes productos en el carrito</h6></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
     }
     else
     {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th><h4>Productos</h4></th>
-                    <th><h5>Precio</h5></th>
-                </tr>
-            </thead>
-            <tbody>
+       
                 @foreach (ProductoSimpleView producto in Model)
                 {
                     total += producto.Precio;
@@ -46,16 +42,17 @@
                             </div>
                         </td>
                         <td>
-                            @producto.Precio€
+                            <h5>@producto.Precio€</h5>
                         </td>
                     </tr>
                 }
                 <tr>
                     <td></td>
-                    <td><h5>Subtotal (@Model.Count producto): @total€</h5></td>
+                    <td>
+                        <h5>Subtotal (@Model.Count productos): @total€</h5>
+                    </td>
                 </tr>
-            </tbody>
-        </table>
-        <span>hola</span>
     }
+        </tbody>
+    </table>
 </div>

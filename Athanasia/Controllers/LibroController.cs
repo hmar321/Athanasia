@@ -18,6 +18,7 @@ namespace Athanasia.Controllers
             this.repo = repo;
             this.memoryCache = memoryCache;
         }
+
         [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Client)]
         public async Task<ActionResult> Index()
         {

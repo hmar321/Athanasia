@@ -1,6 +1,7 @@
 ﻿using Athanasia.Data;
 using Athanasia.Extension;
 using Athanasia.Helpers;
+using Athanasia.Models.Tables;
 using Athanasia.Models.Views;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
@@ -205,6 +206,74 @@ namespace Athanasia.Repositories
                                where idsproductos.Contains(datos.IdProducto)
                                select datos;
                 return await consulta.ToListAsync();
+            }
+        }
+
+        #endregion
+
+        #region USUARIO
+
+        private async Task<int> GetMaxIdUsuarioAsync()
+        {
+            if (this.context.Usuarios.Count() == 0)
+            {
+                return 1;
+            }
+            else
+            {
+                return await this.context.Usuarios.MaxAsync(u => u.IdUsuario) + 1;
+            }
+        }
+
+        public async Task<Usuario> RegistrarUsuarioAsync(string nombre,string apellido, string email, string password)
+        {
+            Usuario usuario = new Usuario();
+            usuario.IdUsuario = await this.GetMaxIdUsuarioAsync();
+            usuario.Nombre = nombre;
+            usuario.Apellido = apellido;
+            usuario.Email = email;
+            usuario.Password = password;
+            usuario.Imagen = "usuario.png";
+            usuario.Salt = HelperTools.GenerateSalt();
+            usuario.Pass = HelperCryptography.EncryptPassword(password, usuario.Salt);
+            usuario.IdEstado = HelperEstados.GetEstadoId(Estados.Pendiente);
+            usuario.Token = HelperTools.GenerateTokenMail();
+            usuario.IdRol = HelperRoles.GetRolId(Roles.Cliente);
+            this.context.Usuarios.Add(usuario);
+            await context.SaveChangesAsync();
+            return usuario;
+        }
+
+        public async Task<Usuario> ActivarUsuarioAsync(string token)
+        {
+            Usuario user = await this.context.Usuarios.FirstOrDefaultAsync(u => u.Token == token);
+            user.IdEstado = HelperEstados.GetEstadoId(Estados.Activo);
+            user.Token = "";
+            await this.context.SaveChangesAsync();
+            return user;
+        }
+
+        public async Task<Usuario> LogInUserAsync(string email, string password)
+        {
+            Usuario usuario = await this.context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+            if (usuario == null)
+            {
+                return null;
+            }
+            else
+            {
+                string salt = usuario.Salt;
+                byte[] temp = HelperCryptography.EncryptPassword(password, salt);
+                byte[] passUser = usuario.Pass;
+                bool respuesta = HelperTools.CompareArrays(temp, passUser);
+                if (respuesta == true)
+                {
+                    return usuario;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
