@@ -6,6 +6,7 @@ using Athanasia.Models.Views;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Metrics;
 
 #region VIEWS
 //alter view V_PRODUCTO as
@@ -46,7 +47,8 @@ using Microsoft.EntityFrameworkCore;
 //    l.PORTADA,
 //    a.NOMBRE AUTOR,
 //    p.PRECIO,
-//    p.ID_FORMATO
+//    p.ID_FORMATO,
+//	1 UNIDADES
 //from Libro l
 //left join AUTOR a on l.ID_AUTOR=a.ID_AUTOR and l.TITULO is not null and a.NOMBRE is not null
 //inner join PRODUCTO p on l.ID_LIBRO=p.ID_LIBRO and p.PRECIO is not null
@@ -113,11 +115,11 @@ using Microsoft.EntityFrameworkCore;
 //order by ID_PRODUCTO
 //go
 
-//create procedure SP_PRODUCTOS
+//alter procedure SP_PRODUCTOS
 //as
-//SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO
+//SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES
 //FROM (
-//	SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO,
+//	SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES,
 //           ROW_NUMBER() OVER(PARTITION BY TITULO ORDER BY ID_PRODUCTO) AS REPETICION
 //    FROM V_PRODUCTO_SIMPLE) PRODUCTOS
 //WHERE REPETICION = 1
@@ -163,6 +165,12 @@ namespace Athanasia.Repositories
         #endregion
 
         #region PRODUCTO_SIMPLE_VIEW
+
+        public async Task<ProductoSimpleView> FindProductoSimpleAsync(int idproducto)
+        {
+            ProductoSimpleView producto = await this.context.ProductosSimplesView.FirstOrDefaultAsync(p => p.IdProducto == idproducto);
+            return producto;
+        }
 
         public async Task<List<ProductoSimpleView>> GetProductosSimplesViewAsync()
         {
@@ -276,7 +284,7 @@ namespace Athanasia.Repositories
                 }
             }
         }
-
+        
         #endregion
 
         #region

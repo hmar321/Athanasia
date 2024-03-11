@@ -1,12 +1,12 @@
 ﻿@{
     int idproducto = (int)ViewData["IDPRODUCTO"];
-    List<int> idsproductos = memoryCache.Get<List<int>>("CARRITO");
-    if (idsproductos == null)
+    List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
+    if (productos == null)
     {
-        idsproductos = new List<int>();
+        productos = new List<ProductoSimpleView>();
     }
 }
-@if (idsproductos.Any(p => p == idproducto))
+@if (productos.Any(prod => prod.IdProducto == idproducto))
 {
     <button class="btn btn-success d-flex flex-column justify-content-center align-items-center" id="@idproducto" value="@idproducto">
         <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="currentColor" class="bi bi-cart-check" viewBox="0 0 16 16">

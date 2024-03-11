@@ -1,10 +1,11 @@
 ﻿@model List<ProductoSimpleView>
 @{
-    double total = 0;
+    double precioTotal = 0;
+    double precioVarios = 0;
 }
 <div class="col-1"></div>
 <div class="col-10">
-    <table class="table table-light">
+    <table id="tablaproductos" class="table table-light">
         <thead>
             <tr>
                 <th style="border-radius:0.35rem 0 0 0;">
@@ -15,21 +16,22 @@
                 </th>
             </tr>
         </thead>
-    @if (Model == null)
-    {
-       
+        <tbody>
+            @if (Model == null)
+            {
+
                 <tr>
                     <td colspan="2" class="p-4">
                         <h6>No tienes productos en el carrito</h6>
                     </td>
                 </tr>
-    }
-    else
-    {
-       
+            }
+            else
+            {
+
                 @foreach (ProductoSimpleView producto in Model)
                 {
-                    total += producto.Precio;
+                    precioTotal += producto.Precio*producto.Unidades;
                     <tr>
                         <td>
                             <div class="d-flex flex-wrap">
@@ -38,21 +40,38 @@
                                 <div class="d-flex flex-column gap-3 m-4">
                                     <h4>@producto.Titulo</h4>
                                     <h5>@producto.Autor</h5>
+                                    <div class="d-flex flex-wrap align-items-start">
+                                        <a asp-controller="Producto" asp-action="UnidadProducto" asp-route-idproducto="@producto.IdProducto" asp-route-valor="-1" class="btn btn-secondary">-</a>
+                                        
+                                            <h6 class="form-control" style="width:2.5rem;">@producto.Unidades</h6>
+                                        
+                                        <a asp-controller="Producto" asp-action="UnidadProducto" asp-route-idproducto="@producto.IdProducto" asp-route-valor="1" class="btn btn-secondary">+</a>
+                                    </div>
                                 </div>
                             </div>
                         </td>
                         <td>
-                            <h5>@producto.Precio€</h5>
+                            @if (producto.Unidades > 1)
+                            {
+                                precioVarios = producto.Precio * producto.Unidades;
+                                <h5>@precioVarios€-(@producto.Precio€)</h5>
+                            }
+                            else
+                            {
+                                <h5>@producto.Precio€</h5>
+                            }
+                            
                         </td>
                     </tr>
                 }
                 <tr>
                     <td></td>
-                    <td>
-                        <h5>Subtotal (@Model.Count productos): @total€</h5>
+                    <td class="d-flex flex-row justify-content-around">
+                        <h5>Subtotal (@Model.Count productos): @precioTotal€</h5>
+                        <a asp-controller="Compras" asp-action="RealizarPedido" class="btn btn-success">Comprar</a>
                     </td>
                 </tr>
-    }
+            }
         </tbody>
     </table>
 </div>

@@ -1,6 +1,7 @@
 ﻿using Athanasia.Extension;
 using Athanasia.Helpers;
 using Athanasia.Models.Tables;
+using Athanasia.Models.Util;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -60,15 +61,37 @@ namespace Athanasia.Controllers
         [HttpPost]
         public async Task<IActionResult> Registro(string nombre, string apellido, string email, string password, string password2, bool terminos)
         {
+            UsuarioInfo info = new UsuarioInfo
+            {
+                Nombre = nombre,
+                Apellido = apellido,
+                Email = email,
+                Password = password,
+                Password2 = password2,
+                Terminos = terminos
+            };
+            if (password != password2)
+            {
+                ViewData["REGISTROUSUARIO"] = info;
+                ViewData["ERROR"] = "La contraseña no es la misma";
+                return View();
+            }
             Usuario usuario = await this.repo.RegistrarUsuarioAsync(nombre, apellido, email, password);
             string serverUrl = this.helperPathProvider.MapUrlServerPath();
             serverUrl = serverUrl + "/Usuario/Login?token=" + usuario.Token;
             string mensaje = "<h3>Usuario registrado<h3>";
             mensaje += "<p>Puede activar su cuenta pulsando el siguiente enlace:</p>";
             mensaje += "<a href='" + serverUrl + "'>" + serverUrl + "</a>";
-            mensaje += "<p>Bienvenido</p>";
-            await this.helperMail.SendMailAsync(email, "Activación cuenta[NO REPLY]", mensaje);
-            ViewData["MENSAJE"] = "Usuario registrado correctamente, activa tu cuenta desde tu correo";
+            try
+            {
+                await this.helperMail.SendMailAsync(email, "Activación cuenta[NO REPLY]", mensaje);
+                ViewData["MENSAJE"] = "Usuario registrado correctamente, activa tu cuenta desde tu correo";
+            }
+            catch (Exception)
+            {
+                ViewData["REGISTROUSUARIO"] = info;
+                ViewData["ERROR"] = "Error al enviar correo";
+            }
             return View();
         }
 

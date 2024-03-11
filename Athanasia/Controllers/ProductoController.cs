@@ -1,4 +1,5 @@
-﻿using Athanasia.Models.Views;
+﻿using Athanasia.Models.Tables;
+using Athanasia.Models.Views;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -18,9 +19,28 @@ namespace Athanasia.Controllers
 
         public async Task<IActionResult> Carrito()
         {
-            List<int> idsproductos = this.memoryCache.Get<List<int>>("CARRITO");
-            List<ProductoSimpleView> productos = await this.repo.FindProductosSimplesViewByIds(idsproductos);
+            List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
             return View(productos);
+        }
+
+        public async Task<IActionResult> UnidadProducto(int idproducto, int valor)
+        {
+            List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
+            ProductoSimpleView producto = productos.FirstOrDefault(prod => prod.IdProducto == idproducto);
+            producto.Unidades += valor;
+            if (producto.Unidades < 1)
+            {
+                productos.Remove(producto);
+            }
+            if (productos.Count == 0)
+            {
+                this.memoryCache.Remove("CARRITO");
+            }
+            else
+            {
+                this.memoryCache.Set("CARRITO", productos);
+            }
+            return RedirectToAction("Carrito");
         }
     }
 }

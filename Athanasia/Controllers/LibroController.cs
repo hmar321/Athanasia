@@ -39,19 +39,20 @@ namespace Athanasia.Controllers
             return View(libro);
         }
 
-        public IActionResult _IconoCarrito(int idproducto, bool agregar)
+        public async Task<IActionResult> _IconoCarrito(int idproducto, bool agregar)
         {
-            List<int> idsproducto = this.memoryCache.Get<List<int>>("CARRITO");
+            List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
             if (agregar == true)
             {
-                if (idsproducto == null)
+                if (productos == null)
                 {
-                    idsproducto = new List<int>();
+                    productos = new List<ProductoSimpleView>();
                 }
-                if (idsproducto.Any(id => id == idproducto) == false)
+                if (productos.Any(prod => prod.IdProducto == idproducto) == false)
                 {
-                    idsproducto.Add(idproducto);
-                    this.memoryCache.Set("CARRITO", idsproducto);
+                    ProductoSimpleView producto = await this.repo.FindProductoSimpleAsync(idproducto);
+                    productos.Add(producto);
+                    this.memoryCache.Set("CARRITO", productos);
                 }
             }
             ViewData["IDPRODUCTO"] = idproducto;

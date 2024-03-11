@@ -20,5 +20,7 @@ namespace Athanasia.Models.Views
         public double Precio { get; set; }
         [Column("ID_FORMATO")]
         public int IdFormato { get; set; }
+        [Column("UNIDADES")]
+        public int Unidades { get; set; }
     }
 }
