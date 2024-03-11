@@ -24,7 +24,8 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-evenly">
-                    <ul id="menu" class="navbar-nav flex-grow-1 align-items-center">
+                    <ul class="navbar-nav flex-grow-1 align-items-center">
+                        <partial name="_Menus" />
                     </ul>
                     <form asp-controller="Libro" asp-action="Index" method="post" class="d-flex gap-2">
                         <input type="text" name="buscador" class="form-control" />
@@ -48,12 +49,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script>
-        $(document).ready(function () {
-            var request = "/Usuario/_Menus";
-            $("#menu").load(request);
-        })
-    </script>
     @await RenderSectionAsync("scripts", required: false)
 </body>
 </html>
