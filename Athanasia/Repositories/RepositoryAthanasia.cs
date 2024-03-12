@@ -53,6 +53,22 @@ using System.Diagnostics.Metrics;
 //left join AUTOR a on l.ID_AUTOR=a.ID_AUTOR and l.TITULO is not null and a.NOMBRE is not null
 //inner join PRODUCTO p on l.ID_LIBRO=p.ID_LIBRO and p.PRECIO is not null
 
+//create view V_PEDIDO_PRODUCTOS as
+// select 
+//	pp.ID_PEDIDO_PRODUCTO,
+//   p.ID_PEDIDO,
+//   l.TITULO,
+//   f.NOMBRE FORMATO,
+//   pp.UNIDADES,
+//   pr.PRECIO,
+//   ep.NOMBRE ESTADO_PEDIDO
+//from PEDIDO p
+//inner join ESTADO_PEDIDO ep on p.ID_ESTADO_PEDIDO=ep.ID_ESTADO_PEDIDO
+//inner join PEDIDOS_PRODUCTOS pp on p.ID_PEDIDO=pp.ID_PEDIDO
+//inner join PRODUCTO pr on pr.ID_PRODUCTO=pr.ID_PRODUCTO
+//inner join FORMATO f on pr.ID_FORMATO=f.ID_FORMATO
+//inner join LIBRO l on pr.ID_LIBRO=l.ID_LIBRO
+
 
 #endregion
 
@@ -127,6 +143,22 @@ using System.Diagnostics.Metrics;
 //and AUTOR is not null
 //order by ID_PRODUCTO
 //go
+
+
+//alter procedure SP_INSERT_PEDIDOS_PRODUCTOS
+//(@unidades int, @idpedido int, @idproducto int)
+//as
+//	declare @maxid int
+//	select @maxid=MAX(ID_PEDIDO_PRODUCTO) from PEDIDOS_PRODUCTOS
+
+//	insert into PEDIDOS_PRODUCTOS values
+//	(@maxid, @unidades, @idpedido, @idproducto)
+
+//	select ID_PEDIDO_PRODUCTO, UNIDADES, ID_PEDIDO, ID_PRODUCTO 
+//	from PEDIDOS_PRODUCTOS
+//	where ID_PEDIDO_PRODUCTO=@maxid
+//go
+
 
 #endregion
 
@@ -233,7 +265,7 @@ namespace Athanasia.Repositories
             }
         }
 
-        public async Task<Usuario> RegistrarUsuarioAsync(string nombre,string apellido, string email, string password)
+        public async Task<Usuario> RegistrarUsuarioAsync(string nombre, string apellido, string email, string password)
         {
             Usuario usuario = new Usuario();
             usuario.IdUsuario = await this.GetMaxIdUsuarioAsync();
@@ -284,7 +316,29 @@ namespace Athanasia.Repositories
                 }
             }
         }
-        
+
+        #endregion
+
+        #region PEDIDO
+        //public async Task<Pedido> InsertPedidoAsync()
+        //{
+
+        //    return null;
+        //}
+        //#endregion
+
+        //#region PEDIDOS_PRODUCTOS
+
+        //public async Task<PedidosProductos> InsertPedidoProductosAsync(int unidades, int idpedido, int idproducto)
+        //{
+        //    string sql = "SP_INSERT_PEDIDOS_PRODUCTOS @unidades,@idpedido,@idproducto";
+        //    SqlParameter paramunidades = new SqlParameter("@unidades", unidades);
+        //    SqlParameter paramidpedido = new SqlParameter("@idpedido", idpedido);
+        //    SqlParameter paramidproducto = new SqlParameter("@idproducto", idproducto);
+        //    var consulta = this.context.PedidosProductos.FromSqlRaw(sql, paramunidades, paramidpedido, paramidproducto);
+        //    return await consulta.FirstOrDefaultAsync();
+        //}
+
         #endregion
 
         #region

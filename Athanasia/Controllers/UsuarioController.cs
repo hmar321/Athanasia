@@ -110,5 +110,10 @@ namespace Athanasia.Controllers
         {
             return View();
         }
+        public async Task<IActionResult> Compras()
+        {
+
+            return View();
+        }
     }
 }
