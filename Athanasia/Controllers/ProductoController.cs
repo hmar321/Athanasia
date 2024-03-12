@@ -1,5 +1,4 @@
-﻿using Athanasia.Models.Tables;
-using Athanasia.Models.Views;
+﻿using Athanasia.Models.Views;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;

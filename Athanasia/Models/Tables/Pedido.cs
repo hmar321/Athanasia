@@ -13,6 +13,8 @@ namespace Athanasia.Models.Tables
         public int? IdUsuario { get; set; }
         [Column("FECHA_SOLICITUID")]
         public DateTime? FechaSolicitud { get; set; }
+        [Column("FECHA_ESTIMADA")]
+        public DateTime? FechaEstimada{ get; set; }
         [Column("FECHA_ENTREGA")]
         public DateTime? FechaEntrega { get; set; }
         [Column("ID_ESTADO_PEDIDO")]

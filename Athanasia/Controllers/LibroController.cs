@@ -1,7 +1,4 @@
-﻿using Athanasia.Extension;
-using Athanasia.Helpers;
-using Athanasia.Models.Tables;
-using Athanasia.Models.Views;
+﻿using Athanasia.Models.Views;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -48,7 +45,7 @@ namespace Athanasia.Controllers
                 {
                     productos = new List<ProductoSimpleView>();
                 }
-                if (productos.Any(prod => prod.IdProducto == idproducto) == false)
+                if (productos.Any(id => id.IdProducto == idproducto) == false)
                 {
                     ProductoSimpleView producto = await this.repo.FindProductoSimpleAsync(idproducto);
                     productos.Add(producto);

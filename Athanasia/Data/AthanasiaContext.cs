@@ -16,7 +16,9 @@ namespace Athanasia.Data
         public DbSet<Formato> Formatos { get; set; }
         public DbSet<Genero> Generos { get; set; }
         public DbSet<GenerosLibros> GenerosLibros { get; set; }
+        public DbSet<InformacionCompra> InformacionesCompra { get; set; }
         public DbSet<Libro> Libros { get; set; }
+        public DbSet<MetodoPago> MetodosPago { get; set; }
         public DbSet<Opinion> Opiniones { get; set; }
         public DbSet<OpinionesLibros> OpinionesLibros { get; set; }
         public DbSet<Pedido> Pedidos { get; set; }

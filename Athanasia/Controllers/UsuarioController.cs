@@ -5,7 +5,6 @@ using Athanasia.Models.Util;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Athanasia.Controllers
 {
@@ -47,11 +46,9 @@ namespace Athanasia.Controllers
                 ViewData["ERROR"] = "Credenciales incorrectas";
                 return View();
             }
-            else
-            {
-                HttpContext.Session.SetObject("USUARIO", usuario);
-                return RedirectToAction("Index", "Libro");
-            }
+
+            HttpContext.Session.SetObject("USUARIO", usuario);
+            return RedirectToAction("Index", "Libro");
         }
 
         public IActionResult Registro()

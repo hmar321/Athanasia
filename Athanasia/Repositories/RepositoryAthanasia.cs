@@ -117,9 +117,9 @@ using System.Diagnostics.Metrics;
 //alter procedure SP_SEARCH_PRODUCTOS
 //(@busqueda nvarchar(255))
 //as
-//SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO
+//SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES
 //FROM (
-//	SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO,
+//	SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES,
 //           ROW_NUMBER() OVER(PARTITION BY TITULO ORDER BY ID_PRODUCTO) AS REPETICION
 //    FROM V_PRODUCTO_SIMPLE) PRODUCTOS
 //WHERE REPETICION = 1
@@ -276,9 +276,9 @@ namespace Athanasia.Repositories
             usuario.Imagen = "usuario.png";
             usuario.Salt = HelperTools.GenerateSalt();
             usuario.Pass = HelperCryptography.EncryptPassword(password, usuario.Salt);
-            usuario.IdEstado = HelperEstados.GetEstadoId(Estados.Pendiente);
+            usuario.IdEstado = HelperTools.GetEstadoId(Estados.Pendiente);
             usuario.Token = HelperTools.GenerateTokenMail();
-            usuario.IdRol = HelperRoles.GetRolId(Roles.Cliente);
+            usuario.IdRol = HelperTools.GetRolId(Roles.Cliente);
             this.context.Usuarios.Add(usuario);
             await context.SaveChangesAsync();
             return usuario;
@@ -287,7 +287,7 @@ namespace Athanasia.Repositories
         public async Task<Usuario> ActivarUsuarioAsync(string token)
         {
             Usuario user = await this.context.Usuarios.FirstOrDefaultAsync(u => u.Token == token);
-            user.IdEstado = HelperEstados.GetEstadoId(Estados.Activo);
+            user.IdEstado = HelperTools.GetEstadoId(Estados.Activo);
             user.Token = "";
             await this.context.SaveChangesAsync();
             return user;
@@ -320,28 +320,41 @@ namespace Athanasia.Repositories
         #endregion
 
         #region PEDIDO
-        //public async Task<Pedido> InsertPedidoAsync()
-        //{
 
-        //    return null;
-        //}
-        //#endregion
-
-        //#region PEDIDOS_PRODUCTOS
-
-        //public async Task<PedidosProductos> InsertPedidoProductosAsync(int unidades, int idpedido, int idproducto)
-        //{
-        //    string sql = "SP_INSERT_PEDIDOS_PRODUCTOS @unidades,@idpedido,@idproducto";
-        //    SqlParameter paramunidades = new SqlParameter("@unidades", unidades);
-        //    SqlParameter paramidpedido = new SqlParameter("@idpedido", idpedido);
-        //    SqlParameter paramidproducto = new SqlParameter("@idproducto", idproducto);
-        //    var consulta = this.context.PedidosProductos.FromSqlRaw(sql, paramunidades, paramidpedido, paramidproducto);
-        //    return await consulta.FirstOrDefaultAsync();
-        //}
+        public async Task<Pedido> InsertPedidoAsync()
+        {
+            //id procesando
+            int estadopedido = 2;
+            int nextid = this.context.Pedidos.Max(o=>o.IdPedido);
+            Pedido pedido = new Pedido
+            {
+                IdPedido=nextid,
+                FechaSolicitud=DateTime.Now,
+                FechaEstimada=DateTime.Now.AddDays(3),
+                FechaEntrega=null,
+                IdEstadoPedido=estadopedido
+            };
+            return null;
+        }
 
         #endregion
 
-        #region
+        #region PEDIDOS_PRODUCTOS
+
+        public async Task<PedidosProductos> InsertPedidoProductosAsync(int unidades, int idpedido, int idproducto)
+        {
+            string sql = "SP_INSERT_PEDIDOS_PRODUCTOS @unidades,@idpedido,@idproducto";
+            SqlParameter paramunidades = new SqlParameter("@unidades", unidades);
+            SqlParameter paramidpedido = new SqlParameter("@idpedido", idpedido);
+            SqlParameter paramidproducto = new SqlParameter("@idproducto", idproducto);
+            var consulta = this.context.PedidosProductos.FromSqlRaw(sql, paramunidades, paramidpedido, paramidproducto);
+            return await consulta.FirstOrDefaultAsync();
+        }
+
         #endregion
+
+        #region 
+        #endregion
+
     }
 }
