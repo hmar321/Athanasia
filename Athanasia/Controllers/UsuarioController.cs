@@ -1,4 +1,5 @@
 ﻿using Athanasia.Extension;
+using Athanasia.Filters;
 using Athanasia.Helpers;
 using Athanasia.Models.Tables;
 using Athanasia.Models.Util;
@@ -27,29 +28,29 @@ namespace Athanasia.Controllers
         {
             return View();
         }
-        public async Task<IActionResult> Login(string? token)
-        {
-            if (token != null)
-            {
-                await this.repo.ActivarUsuarioAsync(token);
-                ViewData["MENSAJE"] = "Cuenta activada correctamente";
-            }
-            return View();
-        }
-        [HttpPost]
-        public async Task<IActionResult> Login(string email, string password)
-        {
+        //public async Task<IActionResult> Login(string? token)
+        //{
+        //    if (token != null)
+        //    {
+        //        await this.repo.ActivarUsuarioAsync(token);
+        //        ViewData["MENSAJE"] = "Cuenta activada correctamente";
+        //    }
+        //    return View();
+        //}
+        //[HttpPost]
+        //public async Task<IActionResult> Login(string email, string password)
+        //{
 
-            Usuario usuario = await this.repo.LogInUserAsync(email, password);
-            if (usuario == null)
-            {
-                ViewData["ERROR"] = "Credenciales incorrectas";
-                return View();
-            }
+        //    Usuario usuario = await this.repo.LogInUserAsync(email, password);
+        //    if (usuario == null)
+        //    {
+        //        ViewData["ERROR"] = "Credenciales incorrectas";
+        //        return View();
+        //    }
 
-            HttpContext.Session.SetObject("USUARIO", usuario);
-            return RedirectToAction("Index", "Libro");
-        }
+        //    HttpContext.Session.SetObject("USUARIO", usuario);
+        //    return RedirectToAction("Index", "Libro");
+        //}
 
         public IActionResult Registro()
         {
@@ -58,7 +59,7 @@ namespace Athanasia.Controllers
         [HttpPost]
         public async Task<IActionResult> Registro(string nombre, string apellido, string email, string password, string password2, bool terminos)
         {
-            UsuarioInfo info = new UsuarioInfo
+            UsuarioRegistro info = new UsuarioRegistro
             {
                 Nombre = nombre,
                 Apellido = apellido,
@@ -88,6 +89,7 @@ namespace Athanasia.Controllers
             {
                 ViewData["REGISTROUSUARIO"] = info;
                 ViewData["ERROR"] = "Error al enviar correo";
+                //await this.repo.DeleteUsuarioAsync(usuario.IdUsuario);
             }
             return View();
         }
@@ -97,16 +99,12 @@ namespace Athanasia.Controllers
             return PartialView("_Menus");
         }
 
-        public IActionResult CerrarSesion()
-        {
-            HttpContext.Session.Remove("USUARIO");
-            return RedirectToAction("Index", "Libro");
-        }
-
+        [AuthorizeUsuarios]
         public IActionResult Perfil()
         {
             return View();
         }
+        [AuthorizeUsuarios]
         public async Task<IActionResult> Compras()
         {
 

@@ -1,19 +1,30 @@
 using Athanasia.Data;
 using Athanasia.Helpers;
 using Athanasia.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddAntiforgery();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultSignInScheme =
+    CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme =
+    CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme =
+    CookieAuthenticationDefaults.AuthenticationScheme;
+}).AddCookie();
+builder.Services.AddControllersWithViews(options => options.EnableEndpointRouting = false);
 builder.Services.AddTransient<HelperPathProvider>();
 builder.Services.AddTransient<HelperMails>();
 builder.Services.AddMemoryCache();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromHours(10);
+    options.IdleTimeout = TimeSpan.FromSeconds(5);
 });
 builder.Services.AddTransient<RepositoryAthanasia>();
 string connectionString = builder.Configuration.GetConnectionString("SqlServerAthanasia");
@@ -34,11 +45,15 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Libro}/{action=Index}/{id?}");
+
+app.UseMvc(routes =>
+{
+    routes.MapRoute(
+        name: "default",
+        template: "{controller=Libro}/{action=Index}/{id?}");
+});
 
 app.Run();

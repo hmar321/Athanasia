@@ -252,6 +252,16 @@ namespace Athanasia.Repositories
         #endregion
 
         #region USUARIO
+        public async Task<Usuario> FindUsuarioByIdAsync(int idusuario)
+        {
+            return await this.context.Usuarios.FirstOrDefaultAsync(u=>u.IdUsuario==idusuario);
+        }
+        public async Task<int> DeleteUsuarioAsync(int idusuario)
+        {
+            Usuario usuario=await this.FindUsuarioByIdAsync(idusuario);
+            this.context.Usuarios.Remove(usuario);
+            return await this.context.SaveChangesAsync();
+        }
 
         private async Task<int> GetMaxIdUsuarioAsync()
         {

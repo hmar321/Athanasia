@@ -1,6 +1,6 @@
 ﻿namespace Athanasia.Models.Util
 {
-    public class UsuarioInfo
+    public class UsuarioRegistro
     {
         public string Nombre { get; set; }
         public string Apellido { get; set; }
