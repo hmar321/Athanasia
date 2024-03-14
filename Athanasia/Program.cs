@@ -17,7 +17,9 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme =
     CookieAuthenticationDefaults.AuthenticationScheme;
 }).AddCookie();
-builder.Services.AddControllersWithViews(options => options.EnableEndpointRouting = false);
+builder.Services.AddControllersWithViews
+    (options => options.EnableEndpointRouting = false)
+    .AddSessionStateTempDataProvider();
 builder.Services.AddTransient<HelperPathProvider>();
 builder.Services.AddTransient<HelperMails>();
 builder.Services.AddMemoryCache();

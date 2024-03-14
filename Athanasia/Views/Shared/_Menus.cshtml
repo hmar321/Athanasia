@@ -1,7 +1,4 @@
-﻿@{
-    Usuario usuario = Context.Session.GetObject<Usuario>("USUARIO");
-}
-@if (usuario == null)
+﻿@if (Context.User.Identity.IsAuthenticated == false)
 {
     <li class="nav-item dropdown">
         <a class="nav-link text-light dropdown-toggle d-flex flex-row align-items-center gap-1" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">

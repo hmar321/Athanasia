@@ -1,4 +1,5 @@
-﻿using Athanasia.Models.Views;
+﻿using Athanasia.Models.Util;
+using Athanasia.Models.Views;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -19,8 +20,11 @@ namespace Athanasia.Controllers
         [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Client)]
         public async Task<ActionResult> Index()
         {
-            List<ProductoSimpleView> libros = await this.repo.GetProductoSimplesViewAsync();
-            return View(libros);
+            int posicion = 1;
+            int ndatos = 8;
+            PaginacionModel<ProductoSimpleView> libros = await this.repo.GetProductosSimplesPaginacionAsyn(posicion, ndatos);
+
+            return View(libros.Lista);
         }
         [HttpPost]
         public async Task<ActionResult> Index(string buscador)

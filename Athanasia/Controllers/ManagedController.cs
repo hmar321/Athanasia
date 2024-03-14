@@ -31,21 +31,23 @@ namespace Athanasia.Controllers
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     ClaimTypes.Name,
                     ClaimTypes.Role);
-                //ID_USUARIO,NOMBRE,APELLIDO,EMAIL,PASSWORD,IMAGEN
-                //PASS,SALT,TOKEN,ID_ROL,ID_ESTADO
                 List<Claim> claims = new List<Claim>
                 {
+                    new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario+""),
                     new Claim(ClaimTypes.Name, usuario.Nombre),
-                    new Claim(ClaimTypes.Role, usuario.IdRol+"")
+                    new Claim(ClaimTypes.Surname, usuario.Apellido),
+                    new Claim(ClaimTypes.Email, usuario.Email),
+                    new Claim(ClaimTypes.Role, usuario.IdRol+""),
+                    new Claim(ClaimTypes.UserData, usuario.Imagen)
                 };
                 identity.AddClaims(claims);
-
                 ClaimsPrincipal usePrincipal = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     usePrincipal);
-                HttpContext.Session.SetObject("USUARIO", usuario);
-                return RedirectToAction("Perfil", "Usuario");
+                string controller = TempData["controller"].ToString();
+                string action = TempData["action"].ToString();
+                return RedirectToAction(action, controller);
             }
             else
             {
@@ -57,7 +59,6 @@ namespace Athanasia.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            HttpContext.Session.Remove("USUARIO");
             return RedirectToAction("Index", "Libro");
         }
     }

@@ -2,10 +2,12 @@
 using Athanasia.Extension;
 using Athanasia.Helpers;
 using Athanasia.Models.Tables;
+using Athanasia.Models.Util;
 using Athanasia.Models.Views;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Diagnostics.Metrics;
 
 #region VIEWS
@@ -159,7 +161,21 @@ using System.Diagnostics.Metrics;
 //	where ID_PEDIDO_PRODUCTO=@maxid
 //go
 
-
+//create procedure SP_PRODUCTO_SIMLE_PAGINACION
+//(@posicion int, @ndatos int, @nregistros int out)
+//as
+//	select ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES from
+//		(select 
+//			ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES,
+//            ROW_NUMBER() over (order by ID_PRODUCTO) POSICION
+//		from
+//			(select
+//			ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES,
+//            ROW_NUMBER() OVER(PARTITION BY TITULO ORDER BY ID_PRODUCTO) AS REPETICION
+//			from V_PRODUCTO_SIMPLE) QUERY
+//		where REPETICION=1) PRIMEROS
+//	where  POSICION>=@posicion and POSICION<@posicion+@ndatos
+//go
 #endregion
 
 
@@ -197,6 +213,24 @@ namespace Athanasia.Repositories
         #endregion
 
         #region PRODUCTO_SIMPLE_VIEW
+
+        public async Task<PaginacionModel<ProductoSimpleView>> GetProductosSimplesPaginacionAsyn(int posicion, int ndatos)
+        {
+            string sql = "SP_PRODUCTO_SIMLE_PAGINACION @posicion,@ndatos,@nregistros out";
+            SqlParameter paramposicion = new SqlParameter("@posicion", posicion);
+            SqlParameter paramndatos = new SqlParameter("@ndatos", ndatos);
+            SqlParameter paramnregistros = new SqlParameter("@nregistros", -1);
+            paramnregistros.Direction = ParameterDirection.Input;
+            var consulta = this.context.ProductosSimplesView.FromSqlRaw(sql, paramposicion, paramndatos, paramnregistros);
+            List<ProductoSimpleView> productos = await consulta.ToListAsync();
+            int registros = int.Parse(paramnregistros.Value.ToString());
+            PaginacionModel<ProductoSimpleView> model = new PaginacionModel<ProductoSimpleView>
+            {
+                Lista = productos,
+                NumeroRegistros = registros
+            };
+            return model;
+        }
 
         public async Task<ProductoSimpleView> FindProductoSimpleAsync(int idproducto)
         {
@@ -254,11 +288,11 @@ namespace Athanasia.Repositories
         #region USUARIO
         public async Task<Usuario> FindUsuarioByIdAsync(int idusuario)
         {
-            return await this.context.Usuarios.FirstOrDefaultAsync(u=>u.IdUsuario==idusuario);
+            return await this.context.Usuarios.FirstOrDefaultAsync(u => u.IdUsuario == idusuario);
         }
         public async Task<int> DeleteUsuarioAsync(int idusuario)
         {
-            Usuario usuario=await this.FindUsuarioByIdAsync(idusuario);
+            Usuario usuario = await this.FindUsuarioByIdAsync(idusuario);
             this.context.Usuarios.Remove(usuario);
             return await this.context.SaveChangesAsync();
         }
@@ -335,14 +369,14 @@ namespace Athanasia.Repositories
         {
             //id procesando
             int estadopedido = 2;
-            int nextid = this.context.Pedidos.Max(o=>o.IdPedido);
+            int nextid = this.context.Pedidos.Max(o => o.IdPedido);
             Pedido pedido = new Pedido
             {
-                IdPedido=nextid,
-                FechaSolicitud=DateTime.Now,
-                FechaEstimada=DateTime.Now.AddDays(3),
-                FechaEntrega=null,
-                IdEstadoPedido=estadopedido
+                IdPedido = nextid,
+                FechaSolicitud = DateTime.Now,
+                FechaEstimada = DateTime.Now.AddDays(3),
+                FechaEntrega = null,
+                IdEstadoPedido = estadopedido
             };
             return null;
         }
