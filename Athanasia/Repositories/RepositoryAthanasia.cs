@@ -161,9 +161,13 @@ using System.Diagnostics.Metrics;
 //	where ID_PEDIDO_PRODUCTO=@maxid
 //go
 
-//create procedure SP_PRODUCTO_SIMLE_PAGINACION
-//(@posicion int, @ndatos int, @nregistros int out)
+//alter procedure SP_PRODUCTO_SIMPLE_PAGINACION
+//(@posicion int, @ndatos int, @npaginas int out)
 //as
+//	select @npaginas=CEILING(COUNT(REPETICION)/CAST(@ndatos AS FLOAT)) from
+//	(select ROW_NUMBER() OVER(PARTITION BY TITULO ORDER BY ID_PRODUCTO) AS REPETICION
+//	from V_PRODUCTO_SIMPLE) AGRUPADOS
+//	where REPETICION=1
 //	select ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES from
 //		(select 
 //			ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES,
@@ -174,8 +178,9 @@ using System.Diagnostics.Metrics;
 //            ROW_NUMBER() OVER(PARTITION BY TITULO ORDER BY ID_PRODUCTO) AS REPETICION
 //			from V_PRODUCTO_SIMPLE) QUERY
 //		where REPETICION=1) PRIMEROS
-//	where  POSICION>=@posicion and POSICION<@posicion+@ndatos
+//	where  POSICION>=@ndatos*@posicion-(@ndatos-1) and POSICION<=@posicion*@ndatos
 //go
+
 #endregion
 
 
@@ -216,18 +221,18 @@ namespace Athanasia.Repositories
 
         public async Task<PaginacionModel<ProductoSimpleView>> GetProductosSimplesPaginacionAsyn(int posicion, int ndatos)
         {
-            string sql = "SP_PRODUCTO_SIMLE_PAGINACION @posicion,@ndatos,@nregistros out";
+            string sql = "SP_PRODUCTO_SIMPLE_PAGINACION @posicion,@ndatos,@npaginas out";
             SqlParameter paramposicion = new SqlParameter("@posicion", posicion);
             SqlParameter paramndatos = new SqlParameter("@ndatos", ndatos);
-            SqlParameter paramnregistros = new SqlParameter("@nregistros", -1);
-            paramnregistros.Direction = ParameterDirection.Input;
-            var consulta = this.context.ProductosSimplesView.FromSqlRaw(sql, paramposicion, paramndatos, paramnregistros);
+            SqlParameter paramnpaginas = new SqlParameter("@npaginas", -1);
+            paramnpaginas.Direction = ParameterDirection.Output;
+            var consulta = this.context.ProductosSimplesView.FromSqlRaw(sql, paramposicion, paramndatos, paramnpaginas);
             List<ProductoSimpleView> productos = await consulta.ToListAsync();
-            int registros = int.Parse(paramnregistros.Value.ToString());
+            int registros = int.Parse(paramnpaginas.Value.ToString());
             PaginacionModel<ProductoSimpleView> model = new PaginacionModel<ProductoSimpleView>
             {
                 Lista = productos,
-                NumeroRegistros = registros
+                NumeroPaginas = registros
             };
             return model;
         }

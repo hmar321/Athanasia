@@ -1,4 +1,5 @@
 ﻿using Athanasia.Extension;
+using Athanasia.Filters;
 using Athanasia.Models.Tables;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -17,13 +18,9 @@ namespace Athanasia.Controllers
             this.memoryCache = memoryCache;
         }
 
+        [AuthorizeUsuarios]
         public IActionResult RealizarPedido()
         {
-            Usuario usuario = HttpContext.Session.GetObject<Usuario>("USUARIO");
-            if (usuario == null)
-            {
-                return RedirectToAction("Login", "Usuario");
-            }
 
             return View();
 

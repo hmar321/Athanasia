@@ -3,6 +3,6 @@
     public class PaginacionModel <T>
     {
         public List<T> Lista { get; set; }
-        public int NumeroRegistros { get; set; }
+        public int NumeroPaginas { get; set; }
     }
 }

@@ -28,29 +28,6 @@ namespace Athanasia.Controllers
         {
             return View();
         }
-        //public async Task<IActionResult> Login(string? token)
-        //{
-        //    if (token != null)
-        //    {
-        //        await this.repo.ActivarUsuarioAsync(token);
-        //        ViewData["MENSAJE"] = "Cuenta activada correctamente";
-        //    }
-        //    return View();
-        //}
-        //[HttpPost]
-        //public async Task<IActionResult> Login(string email, string password)
-        //{
-
-        //    Usuario usuario = await this.repo.LogInUserAsync(email, password);
-        //    if (usuario == null)
-        //    {
-        //        ViewData["ERROR"] = "Credenciales incorrectas";
-        //        return View();
-        //    }
-
-        //    HttpContext.Session.SetObject("USUARIO", usuario);
-        //    return RedirectToAction("Index", "Libro");
-        //}
 
         public IActionResult Registro()
         {

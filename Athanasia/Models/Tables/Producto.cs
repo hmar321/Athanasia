@@ -13,8 +13,6 @@ namespace Athanasia.Models.Tables
         public string? Isbn { get; set; }
         [Column("PRECIO")]
         public double? Precio { get; set; }
-        [Column("STOCK")]
-        public int? Stock { get; set; }
         [Column("ID_FORMATO")]
         public int? IdFormato { get; set; }
         [Column("ID_LIBRO")]

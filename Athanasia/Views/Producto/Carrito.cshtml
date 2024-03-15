@@ -1,7 +1,36 @@
-﻿@model List<ProductoSimpleView>
-@{
+﻿@{
+    List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
     double precioTotal = 0;
     double precioVarios = 0;
+}
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            $("button[data-valor]").each(function () {
+                var idproducto = $(this).data("idproducto");
+                var inicio = "/Producto/_Precio?idproducto=" + idproducto;
+                $("#" + idproducto).load(inicio);
+                $(this).click(function () {
+                    var valor = $(this).data("valor");
+                    var unidades = $(this).data("unidades");
+                    console.log(unidades);
+                    var resultado = unidades + valor;
+                    if (resultado > 0) {
+                        var request = "/Producto/_Precio?idproducto=" + idproducto + "&valor=" + valor;
+                        $("#" + idproducto).load(request);
+                        $("button[data-idproducto='" + idproducto + "']").data("unidades", resultado);
+                        $("h6[data-texto='" + idproducto + "']").text(resultado);
+                        var prodPrecio = $(this).val();
+                        var antiguo = $("#totalcarrito").text();
+                        var restar = prodPrecio * unidades;
+                        var sumar = prodPrecio * resultado;
+                        var total = antiguo - restar + sumar;
+                        $("#totalcarrito").text(total+"");
+                    }
+                })
+            })
+        })
+    </script>
 }
 <div class="col-1"></div>
 <div class="col-10">
@@ -17,7 +46,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (Model == null)
+            @if (productos == null)
             {
 
                 <tr>
@@ -29,7 +58,7 @@
             else
             {
 
-                @foreach (ProductoSimpleView producto in Model)
+                @foreach (ProductoSimpleView producto in productos)
                 {
                     precioTotal += producto.Precio * producto.Unidades;
                     <tr>
@@ -41,39 +70,34 @@
                                     <h4>@producto.Titulo</h4>
                                     <h5>@producto.Autor</h5>
                                     <div class="d-flex flex-wrap align-items-start">
-                                        <a asp-controller="Producto" asp-action="UnidadProducto" asp-route-idproducto="@producto.IdProducto" asp-route-valor="-1" class="btn btn-secondary">-</a>
-                                        <h6 class="form-control d-grid align-content-center justify-content-center" style="width:2.5rem;height:2.5rem;padding:0;">@producto.Unidades</h6>
-                                        <a asp-controller="Producto" asp-action="UnidadProducto" asp-route-idproducto="@producto.IdProducto" asp-route-valor="1" class="btn btn-secondary">+</a>
-                                        <a asp-controller="Producto" asp-action="UnidadProducto" asp-route-idproducto="@producto.IdProducto" asp-route-valor="@(-producto.Unidades)" class="btn btn-danger mx-3 d-flex flex-column justify-content-center align-items-center">
+                                        <button value="@producto.Precio" data-valor="-1" data-unidades="@producto.Unidades" data-idproducto="@producto.IdProducto" class="btn btn-secondary">
+                                            -
+                                        </button>
+                                        <div data-idproducto="@producto.IdProducto">
+                                            <h6 data-texto="@producto.IdProducto" class="form-control d-grid align-content-center justify-content-center" style="width:2.5rem;height:2.5rem;padding:0;">@producto.Unidades</h6>
+                                        </div>
+                                        <button value="@producto.Precio" data-valor="1" data-unidades="@producto.Unidades" data-idproducto="@producto.IdProducto" class="btn btn-secondary">
+                                            +
+                                        </button>
+                                        <a asp-controller="Producto" asp-action="QuitarProductoCarrito" asp-route-idproducto="@producto.IdProducto" class="btn btn-danger mx-3 d-flex flex-column justify-content-center align-items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="25" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
                                                 <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
                                                 <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
                                             </svg>
                                         </a>
-
                                     </div>
                                 </div>
 
                             </div>
                         </td>
-                        <td>
-                            @if (producto.Unidades > 1)
-                            {
-                                precioVarios = producto.Precio * producto.Unidades;
-                                <h5>@precioVarios€-(@producto.Precio€)</h5>
-                            }
-                            else
-                            {
-                                <h5>@producto.Precio€</h5>
-                            }
-
+                        <td id="@producto.IdProducto">
                         </td>
                     </tr>
                 }
                 <tr>
                     <td></td>
                     <td class="d-flex flex-row justify-content-around">
-                        <h5>Subtotal (@Model.Count productos): @precioTotal€</h5>
+                        <h5>Subtotal (@productos.Count productos): <span id="totalcarrito">@precioTotal</span>€</h5>
                         <a asp-controller="Pedido" asp-action="RealizarPedido" class="btn btn-success">Comprar</a>
                     </td>
                 </tr>

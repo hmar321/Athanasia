@@ -18,19 +18,33 @@ namespace Athanasia.Controllers
 
         public async Task<IActionResult> Carrito()
         {
-            List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
-            return View(productos);
+            return View();
         }
 
-        public async Task<IActionResult> UnidadProducto(int idproducto, int valor)
+        public IActionResult _Precio(int idproducto, int? valor)
+        {
+            List<ProductoSimpleView> productos = memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
+            ProductoSimpleView producto = productos.FirstOrDefault(p => p.IdProducto == idproducto);
+            if (valor != null)
+            {
+                producto.Unidades += valor.Value;
+                if (producto.Unidades < 1)
+                {
+                    productos.Remove(producto);
+                }
+                if (productos.Count == 0)
+                {
+                    memoryCache.Remove("CARRITO");
+                }
+            }
+            return PartialView("_Precio", producto);
+        }
+
+        public async Task<IActionResult> QuitarProductoCarrito(int idproducto)
         {
             List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
             ProductoSimpleView producto = productos.FirstOrDefault(prod => prod.IdProducto == idproducto);
-            producto.Unidades += valor;
-            if (producto.Unidades < 1)
-            {
-                productos.Remove(producto);
-            }
+            productos.Remove(producto);
             if (productos.Count == 0)
             {
                 this.memoryCache.Remove("CARRITO");

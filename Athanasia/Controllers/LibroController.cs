@@ -17,14 +17,17 @@ namespace Athanasia.Controllers
             this.memoryCache = memoryCache;
         }
 
-        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Client)]
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(int? posicion)
         {
-            int posicion = 1;
-            int ndatos = 8;
-            PaginacionModel<ProductoSimpleView> libros = await this.repo.GetProductosSimplesPaginacionAsyn(posicion, ndatos);
-
-            return View(libros.Lista);
+            if (posicion == null)
+            {
+                posicion = 1;
+            }
+            int ndatos = 4;
+            PaginacionModel<ProductoSimpleView> model = await this.repo.GetProductosSimplesPaginacionAsyn(posicion.Value, ndatos);
+            ViewData["POSICION"] = posicion.Value;
+            ViewData["PAGINAS"] = model.NumeroPaginas;
+            return View(model.Lista);
         }
         [HttpPost]
         public async Task<ActionResult> Index(string buscador)
