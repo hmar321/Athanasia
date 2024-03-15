@@ -117,20 +117,28 @@ using System.Diagnostics.Metrics;
 #region PROCEDURES
 
 //alter procedure SP_SEARCH_PRODUCTOS
-//(@busqueda nvarchar(255))
+//(@busqueda nvarchar(255), @posicion int, @ndatos int, @npaginas int out)
 //as
-//SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES
-//FROM (
-//	SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES,
-//           ROW_NUMBER() OVER(PARTITION BY TITULO ORDER BY ID_PRODUCTO) AS REPETICION
-//    FROM V_PRODUCTO_SIMPLE) PRODUCTOS
-//WHERE REPETICION = 1
-//and TITULO is not null
-//and AUTOR is not null
-//and dbo.LIMPIAR(TITULO) like @busqueda
-//or dbo.LIMPIAR(AUTOR) like @busqueda
-//and REPETICION = 1
-//order by ID_PRODUCTO
+//	select @npaginas=CEILING(COUNT(REPETICION)/CAST(@ndatos AS FLOAT)) from
+//	(select ROW_NUMBER() OVER(PARTITION BY TITULO ORDER BY ID_PRODUCTO) AS REPETICION
+//	from V_PRODUCTO_SIMPLE) AGRUPADOS
+//	where REPETICION=1
+//	select ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES from
+//		(select 
+//			ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES,
+//               ROW_NUMBER() over (order by ID_PRODUCTO) POSICION
+//		from
+//			(select
+//			ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES,
+//               ROW_NUMBER() OVER(PARTITION BY TITULO ORDER BY ID_PRODUCTO) AS REPETICION
+//			from V_PRODUCTO_SIMPLE) QUERY
+//		where REPETICION=1
+//		and TITULO is not null
+//		and AUTOR is not null
+//		and dbo.LIMPIAR(TITULO) like @busqueda
+//		or dbo.LIMPIAR(AUTOR) like @busqueda
+//		and REPETICION=1) PRIMEROS
+//	where  POSICION>=@ndatos*@posicion-(@ndatos-1) and POSICION<=@posicion*@ndatos
 //go
 
 //alter procedure SP_PRODUCTOS
