@@ -6,7 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+//builder.Services.AddAuthorization(options =>
+//{
+//    options.AddPolicy("PERMISOSELEVADOS",
+//        policy => policy.RequireRole("Psiquiatría", "Cardiología"));
+//    options.AddPolicy("ADMIN",
+//        policy => policy.RequireClaim("Administrador"));
+//});
 builder.Services.AddAntiforgery();
 builder.Services.AddAuthentication(options =>
 {
@@ -16,7 +22,9 @@ builder.Services.AddAuthentication(options =>
     CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme =
     CookieAuthenticationDefaults.AuthenticationScheme;
-}).AddCookie();
+}).AddCookie(
+    CookieAuthenticationDefaults.AuthenticationScheme,
+    config => config.AccessDeniedPath = "/Managed/ErrorAcceso");
 builder.Services.AddControllersWithViews
     (options => options.EnableEndpointRouting = false)
     .AddSessionStateTempDataProvider();
