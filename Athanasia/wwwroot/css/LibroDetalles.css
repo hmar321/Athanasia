@@ -22,10 +22,12 @@
     align-items: center;
 }
 .seccion-sinopsis {
-    max-width: 48rem;
+    max-width: 60rem;
+    min-width:15rem;
     padding:1rem;
 }
 .seccion-info {
-    width:16vw;
+    width:15vw;
     min-width:12rem;
+    max-width:20rem;
 }

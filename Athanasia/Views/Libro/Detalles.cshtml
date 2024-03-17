@@ -1,11 +1,12 @@
 ﻿@model ProductoView
 @{
     List<string> generos = ViewData["GENEROS"] as List<string>;
+    List<FormatoLibroView> formatos = ViewData["FORMATOS"] as List<FormatoLibroView>;
 }
 @section styles {
     <link rel="stylesheet" href="~/css/LibroDetalles.css" />
 }
-<div class="col-12 d-flex flex-column align-items-center">
+<div class="d-flex flex-column align-items-center">
 
     @if (Model == null)
     {
@@ -17,53 +18,71 @@
             <div class="seccion-portada">
                 <img src="~/images/portadas/@Model.Portada" class="rounded imglibro">
             </div>
-            <div class="seccion-sinopsis" style="padding-top:1.5rem">
-                <h1 class="text-primary">@Model.Titulo</h1>
-                <h5 class="text-light">Autor: @Model.Autor</h5>
-                <p class="text-light" style="text-align:justify">@Model.Sinopsis</p>
-            </div>
-            <div class="seccion-info">
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        ISBN:
-                        <h6>@Model.Isbn</h6>
-                    </li>
-                    <li class="list-group-item">
-                        Formato:
-                        <h6>@Model.Formato</h6>
-                    </li>
-                    <li class="list-group-item">
-                        Precio :
-                        <h6>@Model.Precio€</h6>
-                    </li>
-                    @if (Model.Saga != null)
-                    {
+            <div class="d-flex flex-row">
+                <div class="seccion-sinopsis" style="padding-top:1.5rem">
+                    <h1 class="text-primary">@Model.Titulo</h1>
+                    <h5 class="text-light">Autor: @Model.Autor</h5>
+                    <p class="text-light" style="text-align:justify">@Model.Sinopsis</p>
+                </div>
+                <div class="seccion-info">
+                    <ul class="list-group">
                         <li class="list-group-item">
-                            Saga :
-                            <h6>@Model.Saga</h6>
-                        </li>
-                    }
-                    <li class="list-group-item">
-                        Generos:
-                        @if (generos == null)
-                        {
-                            <span>Sin generos</span>
-                        }
-                        else
-                        {
-                            <div class="d-flex flex-wrap gap-1">
-                                @foreach (string genero in generos)
+                            Formatos:
+                            <div>
+                                @foreach (FormatoLibroView formato in formatos)
                                 {
-                                    <button class="btn btn-primary btn-sm"> @genero</button>
+                                    @if (formato.IdProducto == Model.IdProducto)
+                                    {
+                                        <a class="btn btn-dark mb-1" asp-controller="Libro" asp-action="Detalles" asp-route-idproducto="@formato.IdProducto">@formato.Formato</a>
+                                    }
+                                    else
+                                    {
+                                        <a class="btn btn-outline-dark mb-1" asp-controller="Libro" asp-action="Detalles" asp-route-idproducto="@formato.IdProducto">@formato.Formato</a>
+                                    }
                                 }
                             </div>
+                        </li>
+                        <li class="list-group-item">
+                            Precio :
+                            <h5>@Model.Precio€</h5>
+                        </li>
+                        <li class="list-group-item">
+                            ISBN:
+                            <h6>@Model.Isbn</h6>
+                        </li>
+                        <li class="list-group-item">
+                            Formato:
+                            <h6>@Model.Formato</h6>
+                        </li>
+                        @if (Model.Saga != null)
+                        {
+                            <li class="list-group-item">
+                                Saga :
+                                <h6>@Model.Saga</h6>
+                            </li>
                         }
-                    </li>
-                </ul>
+                        <li class="list-group-item">
+                            Generos:
+                            @if (generos == null)
+                            {
+                                <span>Sin generos</span>
+                            }
+                            else
+                            {
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach (string genero in generos)
+                                    {
+                                        <a asp-controller="Producto" asp-action="LibrosGenero" asp-route-genero="@genero" class="btn btn-primary btn-sm"> @genero</a>
+                                    }
+                                </div>
+                            }
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-        <div>
-            Comentarios
+        <div class="text-light">
+            Comentarios in development
         </div>
     }
 </div>

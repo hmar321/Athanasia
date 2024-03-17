@@ -1,26 +1,36 @@
-﻿<div class="card bg-light">
+﻿@{
+    int idusuario = int.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+    string nombre = Context.User.Identity.Name;
+    string apellido = Context.User.FindFirst(ClaimTypes.Surname).Value;
+    string email = Context.User.FindFirst(ClaimTypes.Email).Value;
+    string imagen = Context.User.FindFirst(ClaimTypes.UserData).Value;
+}
+<div class="card bg-light p-5">
     <h1>Perfil</h1>
-    <img src="~/Images/Usuarios/@Context.User.FindFirst(ClaimTypes.UserData).Value" class="rounded-circle" style="width:15rem;" />
-    <h4>@Context.User.Identity.Name @Context.User.FindFirst(ClaimTypes.Surname).Value</h4>
+    <img src="~/Images/Usuarios/@imagen" class="rounded-circle" style="width:15rem;" />
+    <h4>@nombre @apellido</h4>
     <hr />
     <dl class="row">
-        <dt class="col-sm-2">
+        <dt class="col-sm-3">
             Nombre
         </dt>
-        <dd class="col-sm-10">
-            @Context.User.Identity.Name
+        <dd class="col-sm-9">
+            @nombre
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-3">
             Apellido
         </dt>
-        <dd class="col-sm-10">
-            @Context.User.FindFirst(ClaimTypes.Surname).Value
+        <dd class="col-sm-9">
+            @apellido
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-3">
             Email
         </dt>
-        <dd class="col-sm-10">
-            @Context.User.FindFirst(ClaimTypes.Email).Value
+        <dd class="col-sm-9">
+            @email
         </dd>
     </dl>
+    <div>
+        <a asp-controller="Usuario" asp-action="Editar" asp-route-idusuario="@idusuario" class="btn btn-dark">Editar</a>
+    </div>
 </div>

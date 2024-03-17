@@ -24,10 +24,7 @@ builder.Services.AddTransient<HelperPathProvider>();
 builder.Services.AddTransient<HelperMails>();
 builder.Services.AddMemoryCache();
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromSeconds(5);
-});
+builder.Services.AddSession();
 builder.Services.AddTransient<RepositoryAthanasia>();
 string connectionString = builder.Configuration.GetConnectionString("SqlServerAthanasia");
 builder.Services.AddDbContext<AthanasiaContext>(

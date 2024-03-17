@@ -1,7 +1,10 @@
-﻿using Athanasia.Models.Views;
+﻿using Athanasia.Models.Tables;
+using Athanasia.Models.Util;
+using Athanasia.Models.Views;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using System.Diagnostics;
 
 namespace Athanasia.Controllers
 {
@@ -54,6 +57,75 @@ namespace Athanasia.Controllers
                 this.memoryCache.Set("CARRITO", productos);
             }
             return RedirectToAction("Carrito");
+        }
+
+        public async Task<ActionResult> Buscador(string? busqueda, int? posicion)
+        {
+            List<Categoria> categs = await this.repo.GetAllCategoriasAsync();
+            List<Genero> geners = await this.repo.GetAllGenerosAsync();
+            List<int> categorias = memoryCache.Get<List<int>>("FILTROCATEGORIAS");
+            List<int> generos = memoryCache.Get<List<int>>("FILTROGENEROS");
+            if (categorias == null)
+            {
+                categorias = categs.Select(c => c.IdCategoria).ToList();
+            }
+            if (generos == null)
+            {
+                generos = geners.Select(g => g.IdGenero).ToList();
+            }
+            if (busqueda == null)
+            {
+                busqueda = "";
+            }
+            if (posicion == null)
+            {
+                posicion = 1;
+            }
+            int ndatos = 4;
+            PaginacionModel<ProductoSimpleView> model = await this.repo.GetProductoSimpleViewsCategoriasGeneroAsync(busqueda, posicion.Value, ndatos, categorias, generos);
+            ViewData["POSICION"] = posicion.Value;
+            ViewData["PAGINAS"] = model.NumeroPaginas;
+            ViewData["BUSQUEDA"] = busqueda;
+            ViewData["CATEGORIAS"] = categs;
+            ViewData["GENEROS"] = geners;
+            return View(model.Lista);
+        }
+        [HttpPost]
+        public async Task<ActionResult> Buscador(string? busqueda, List<int> categoria, List<int> genero)
+        {
+            List<Categoria> categs = await this.repo.GetAllCategoriasAsync();
+            List<Genero> geners = await this.repo.GetAllGenerosAsync();
+            if (categoria.Count == 0)
+            {
+                categoria = categs.Select(c => c.IdCategoria).ToList();
+                memoryCache.Remove("FILTROCATEGORIAS");
+            }
+            else
+            {
+                memoryCache.Set("FILTROCATEGORIAS", categoria);
+            }
+            if (genero.Count == 0)
+            {
+                genero = geners.Select(g => g.IdGenero).ToList();
+                memoryCache.Remove("FILTROGENEROS");
+            }
+            else
+            {
+                memoryCache.Set("FILTROGENEROS", genero);
+            }
+            if (busqueda == null)
+            {
+                busqueda = "";
+            }
+            int posicion = 1;
+            int ndatos = 4;
+            PaginacionModel<ProductoSimpleView> model = await this.repo.GetProductoSimpleViewsCategoriasGeneroAsync(busqueda, posicion, ndatos, categoria, genero);
+            ViewData["POSICION"] = posicion;
+            ViewData["PAGINAS"] = model.NumeroPaginas;
+            ViewData["BUSQUEDA"] = busqueda;
+            ViewData["CATEGORIAS"] = categs;
+            ViewData["GENEROS"] = geners;
+            return View(model.Lista);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Athanasia.Models.Util;
+﻿using Athanasia.Models.Tables;
+using Athanasia.Models.Util;
 using Athanasia.Models.Views;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -29,17 +30,13 @@ namespace Athanasia.Controllers
             ViewData["PAGINAS"] = model.NumeroPaginas;
             return View(model.Lista);
         }
-        [HttpPost]
-        public async Task<ActionResult> Index(string buscador)
-        {
-            List<ProductoSimpleView> libros = await this.repo.FindProductosSimplesViewAsync(buscador);
-            return View(libros);
-        }
 
         public async Task<ActionResult> Detalles(int idproducto)
         {
-            ProductoView libro = await this.repo.FindProductoAsync(idproducto);
+            ProductoView libro = await this.repo.GetProductoByIdAsync(idproducto);
+            List<FormatoLibroView> formatos = await this.repo.GetAllFormatoLibroViewByIdLibroAsync(libro.IdLibro);
             ViewData["GENEROS"] = libro.Generos.Split(", ").ToList();
+            ViewData["FORMATOS"] = formatos;
             return View(libro);
         }
 
@@ -54,7 +51,7 @@ namespace Athanasia.Controllers
                 }
                 if (productos.Any(id => id.IdProducto == idproducto) == false)
                 {
-                    ProductoSimpleView producto = await this.repo.FindProductoSimpleAsync(idproducto);
+                    ProductoSimpleView producto = await this.repo.GetProductoSimpleByIdAsync(idproducto);
                     productos.Add(producto);
                     this.memoryCache.Set("CARRITO", productos);
                 }

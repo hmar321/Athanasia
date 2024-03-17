@@ -5,6 +5,7 @@ using Athanasia.Models.Tables;
 using Athanasia.Models.Util;
 using Athanasia.Models.Views;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -13,7 +14,8 @@ using System.Diagnostics.Metrics;
 #region VIEWS
 //alter view V_PRODUCTO as
 //select
-//	  ISNULL(p.ID_PRODUCTO, - 1) ID_PRODUCTO,
+//	ISNULL(p.ID_PRODUCTO, - 1) ID_PRODUCTO,
+//    l.ID_LIBRO,
 //    l.TITULO,
 //    l.SINOPSIS,
 //    l.FECHA_PUBLICACION,
@@ -36,7 +38,7 @@ using System.Diagnostics.Metrics;
 //inner join PRODUCTO p on l.ID_LIBRO = p.ID_LIBRO and p.ISBN is not null and p.PRECIO is not null
 //left join EDITORIAL e on e.ID_EDITORIAL = p.ID_EDITORIAL
 //inner join FORMATO f on f.ID_FORMATO=p.ID_FORMATO
-//group by p.ID_PRODUCTO, l.TITULO, c.NOMBRE, a.NOMBRE,
+//group by p.ID_PRODUCTO, l.ID_LIBRO, l.TITULO, c.NOMBRE, a.NOMBRE,
 //s.NOMBRE, l.SINOPSIS, l.FECHA_PUBLICACION, l.PORTADA,
 //p.ISBN, p.PRECIO, e.NOMBRE, e.LOGO, f.NOMBRE
 
@@ -45,15 +47,18 @@ using System.Diagnostics.Metrics;
 //alter view V_PRODUCTO_SIMPLE as
 //select
 //    ISNULL(p.ID_PRODUCTO, -1) ID_PRODUCTO,
+//    l.ID_LIBRO,
 //    l.TITULO,
 //    l.PORTADA,
 //    a.NOMBRE AUTOR,
 //    p.PRECIO,
 //    p.ID_FORMATO,
-//	1 UNIDADES
+//    f.NOMBRE FORMATO,
+//      CAST(1 as int) UNIDADES
 //from Libro l
 //left join AUTOR a on l.ID_AUTOR=a.ID_AUTOR and l.TITULO is not null and a.NOMBRE is not null
 //inner join PRODUCTO p on l.ID_LIBRO=p.ID_LIBRO and p.PRECIO is not null
+//inner join FORMATO f on p.ID_FORMATO=f.ID_FORMATO and f.NOMBRE is not null
 
 //create view V_PEDIDO_PRODUCTOS as
 // select 
@@ -71,6 +76,28 @@ using System.Diagnostics.Metrics;
 //inner join FORMATO f on pr.ID_FORMATO=f.ID_FORMATO
 //inner join LIBRO l on pr.ID_LIBRO=l.ID_LIBRO
 
+//alter view V_PRODUCTO_BUSCADO as
+//select
+//    ISNULL(p.ID_PRODUCTO, -1) ID_PRODUCTO,
+//    l.TITULO,
+//    l.PORTADA,
+//    a.NOMBRE AUTOR,
+//    p.PRECIO,
+//    p.ID_FORMATO,
+//    f.NOMBRE FORMATO,
+//    G.ID_GENERO,
+//    l.ID_CATEGORIA,
+//	1 UNIDADES
+//from Libro l
+//left join AUTOR a on l.ID_AUTOR=a.ID_AUTOR and l.TITULO is not null and a.NOMBRE is not null
+//inner join PRODUCTO p on l.ID_LIBRO=p.ID_LIBRO and p.PRECIO is not null
+//inner join FORMATO f on p.ID_FORMATO=f.ID_FORMATO and f.NOMBRE is not null
+//inner join GENEROS_LIBROS gl on l.ID_LIBRO=gl.ID_LIBRO
+//inner join GENERO g on gl.ID_GENERO=g.ID_GENERO
+
+//alter view SP_FORMATO_LIBRO as
+//select ISNULL(ID_PRODUCTO,-1) ID_PRODUCTO, ID_LIBRO, f.NOMBRE FORMATO from PRODUCTO p
+//inner join FORMATO f on f.ID_FORMATO=p.ID_FORMATO
 
 #endregion
 
@@ -117,33 +144,75 @@ using System.Diagnostics.Metrics;
 #region PROCEDURES
 
 //alter procedure SP_SEARCH_PRODUCTOS
-//(@busqueda nvarchar(255))
+//(@busqueda nvarchar(255), @posicion int, @ndatos int, @npaginas int out)
 //as
-//SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES
-//FROM (
-//	SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES,
-//           ROW_NUMBER() OVER(PARTITION BY TITULO ORDER BY ID_PRODUCTO) AS REPETICION
-//    FROM V_PRODUCTO_SIMPLE) PRODUCTOS
-//WHERE REPETICION = 1
-//and TITULO is not null
-//and AUTOR is not null
-//and dbo.LIMPIAR(TITULO) like @busqueda
-//or dbo.LIMPIAR(AUTOR) like @busqueda
-//and REPETICION = 1
-//order by ID_PRODUCTO
+//	select @npaginas=CEILING(COUNT(ID_PRODUCTO)/CAST(@ndatos AS FLOAT)) from
+//	(select ID_PRODUCTO, ID_LIBRO, TITULO, AUTOR, ROW_NUMBER() over(partition by TITULO, AUTOR order by ID_PRODUCTO) REPETICION
+//	from V_PRODUCTO_SIMPLE) AGRUPADOS
+//	where REPETICION=1
+//	and TITULO is not null
+//	and AUTOR is not null
+//	and dbo.LIMPIAR(TITULO) like @busqueda
+//	or dbo.LIMPIAR(AUTOR) like @busqueda
+//	and REPETICION = 1
+//	select ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES
+//	from
+//		(select ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES,
+//        ROW_NUMBER() over (order by ID_PRODUCTO) POSICION
+//		from 
+//			(select ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES,
+//            ROW_NUMBER() over(partition by TITULO, AUTOR order by ID_PRODUCTO) REPETICION
+//			from V_PRODUCTO_SIMPLE) QUERY
+//		where REPETICION = 1
+//		and TITULO is not null
+//		and AUTOR is not null
+//		and dbo.LIMPIAR(TITULO) like @busqueda
+//		or dbo.LIMPIAR(AUTOR) like @busqueda
+//		and REPETICION = 1) QUERY
+//	where POSICION>=@ndatos*@posicion-(@ndatos-1) and POSICION<=@posicion*@ndatos
+//	order by ID_PRODUCTO
 //go
 
 //alter procedure SP_PRODUCTOS
 //as
-//SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES
+//SELECT ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES
 //FROM (
-//	SELECT ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES,
+//	SELECT ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES,
 //           ROW_NUMBER() OVER(PARTITION BY TITULO ORDER BY ID_PRODUCTO) AS REPETICION
 //    FROM V_PRODUCTO_SIMPLE) PRODUCTOS
 //WHERE REPETICION = 1
 //and TITULO is not null
 //and AUTOR is not null
 //order by ID_PRODUCTO
+//go
+
+
+//alter procedure SP_PRODUCTO_SIMPLE_PAGINACION
+//(@posicion int, @ndatos int, @npaginas int out)
+//as
+//	select @npaginas=CEILING(COUNT(ID_PRODUCTO)/CAST(@ndatos AS FLOAT)) from
+//	(select ID_PRODUCTO, ROW_NUMBER() over(partition by TITULO, AUTOR order by ID_PRODUCTO) REPETICION
+//	from V_PRODUCTO_SIMPLE) AGRUPADOS
+//	where REPETICION=1
+//	select ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES from
+//		(select 
+//			ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES,
+//            ROW_NUMBER() over (order by ID_PRODUCTO) POSICION
+//		from
+//			(select
+//			ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES,
+//            ROW_NUMBER() over(partition by TITULO, AUTOR order by ID_PRODUCTO) REPETICION
+//			from V_PRODUCTO_SIMPLE) QUERY
+//		where REPETICION=1) PRIMEROS
+//	where  POSICION>=@ndatos*@posicion-(@ndatos-1) and POSICION<=@posicion*@ndatos
+//go
+
+//alter procedure SP_GENEROS
+//as
+//	select distinct g.ID_GENERO, g.NOMBRE, g.DESCRIPCION from GENERO g
+//	inner join GENEROS_LIBROS gl on gl.ID_GENERO=g.ID_GENERO
+//	group by g.ID_GENERO, g.NOMBRE, g.DESCRIPCION
+//	order by g.NOMBRE
 //go
 
 
@@ -161,26 +230,45 @@ using System.Diagnostics.Metrics;
 //	where ID_PEDIDO_PRODUCTO=@maxid
 //go
 
-//alter procedure SP_PRODUCTO_SIMPLE_PAGINACION
-//(@posicion int, @ndatos int, @npaginas int out)
-//as
-//	select @npaginas=CEILING(COUNT(REPETICION)/CAST(@ndatos AS FLOAT)) from
-//	(select ROW_NUMBER() OVER(PARTITION BY TITULO ORDER BY ID_PRODUCTO) AS REPETICION
-//	from V_PRODUCTO_SIMPLE) AGRUPADOS
-//	where REPETICION=1
-//	select ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES from
-//		(select 
-//			ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES,
-//            ROW_NUMBER() over (order by ID_PRODUCTO) POSICION
-//		from
-//			(select
-//			ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, UNIDADES,
-//            ROW_NUMBER() OVER(PARTITION BY TITULO ORDER BY ID_PRODUCTO) AS REPETICION
-//			from V_PRODUCTO_SIMPLE) QUERY
-//		where REPETICION=1) PRIMEROS
-//	where  POSICION>=@ndatos*@posicion-(@ndatos-1) and POSICION<=@posicion*@ndatos
-//go
 
+//create procedure SP_SEARCH_PRODUCTOS_FILTRO
+//(@busqueda nvarchar(255), @posicion int, @ndatos int, @categorias nvarchar(255), @generos nvarchar(255), @npaginas int out)
+//as
+//	select @npaginas=CEILING(COUNT(ID_PRODUCTO)/CAST(@ndatos AS FLOAT)) from
+//		(select ID_PRODUCTO, TITULO, AUTOR, ROW_NUMBER() over(partition by TITULO, AUTOR order by ID_PRODUCTO) REPETICION
+//		from
+//			(select distinct ID_PRODUCTO, TITULO, AUTOR
+//			from V_PRODUCTO_BUSCADO
+//			where ID_CATEGORIA in (select CAST(value as int) from STRING_SPLIT(@categorias, ','))
+//			and ID_GENERO in (select CAST(value as int) from STRING_SPLIT(@generos, ','))) DISTINTOS) AGRUPADOS
+//	where REPETICION=1
+//	and TITULO is not null
+//	and AUTOR is not null
+//	and dbo.LIMPIAR(TITULO) like @busqueda
+//	or dbo.LIMPIAR(AUTOR) like @busqueda
+//	and REPETICION = 1
+//	select ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES
+//	from
+//		(select ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES,
+//        ROW_NUMBER() over (order by ID_PRODUCTO) POSICION
+//		from 
+//		(select 
+//		ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES,
+//        ROW_NUMBER() over(partition by TITULO, AUTOR order by ID_PRODUCTO) REPETICION
+//		from
+//			(select distinct ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES
+//			from V_PRODUCTO_BUSCADO
+//			where ID_CATEGORIA in (select CAST(value as int) from STRING_SPLIT(@categorias, ','))
+//			and ID_GENERO in (select CAST(value as int) from STRING_SPLIT(@generos, ','))) QUERY) GRUPO
+//		where REPETICION = 1
+//		and TITULO is not null
+//		and AUTOR is not null
+//		and dbo.LIMPIAR(TITULO) like @busqueda
+//		or dbo.LIMPIAR(AUTOR) like @busqueda
+//		and REPETICION = 1) QUERY
+//	where POSICION>=@ndatos*@posicion-(@ndatos-1) and POSICION<=@posicion*@ndatos
+//	order by ID_PRODUCTO
+//go
 #endregion
 
 
@@ -197,20 +285,23 @@ namespace Athanasia.Repositories
         {
             this.context = context;
         }
+
+
+
         #region PRODUCTO_VIEW
-        public async Task<List<ProductoView>> GetProductosViewAsync()
+        public async Task<List<ProductoView>> GetAllProductoViewAsync()
         {
             List<ProductoView> productos = await this.context.ProductosView.ToListAsync();
             return productos;
         }
 
-        public async Task<List<ProductoView>> GetProductosViewByFormatoAsync(string formato)
+        public async Task<List<ProductoView>> GetProductoViewByFormatoAsync(string formato)
         {
             List<ProductoView> productos = await this.context.ProductosView.Where(o => o.Formato == formato).ToListAsync();
             return productos;
         }
 
-        public async Task<ProductoView> FindProductoAsync(int idproducto)
+        public async Task<ProductoView> GetProductoByIdAsync(int idproducto)
         {
             ProductoView producto = await this.context.ProductosView.FirstOrDefaultAsync(p => p.IdProducto == idproducto);
             return producto;
@@ -219,6 +310,25 @@ namespace Athanasia.Repositories
 
         #region PRODUCTO_SIMPLE_VIEW
 
+
+        public async Task<ProductoSimpleView> GetProductoSimpleByIdAsync(int idproducto)
+        {
+            ProductoSimpleView producto = await this.context.ProductosSimplesView.FirstOrDefaultAsync(p => p.IdProducto == idproducto);
+            return producto;
+        }
+
+        public async Task<List<ProductoSimpleView>> GetAllProductoSimpleViewAsync()
+        {
+            List<ProductoSimpleView> productosSimples = await this.context.ProductosSimplesView.ToListAsync();
+            return productosSimples;
+        }
+
+        public async Task<List<ProductoSimpleView>> GetProductoSimpleViewTituloAutorAsync()
+        {
+            string sql = "SP_PRODUCTOS";
+            var consulta = this.context.ProductosSimplesView.FromSqlRaw(sql);
+            return await consulta.ToListAsync();
+        }
         public async Task<PaginacionModel<ProductoSimpleView>> GetProductosSimplesPaginacionAsyn(int posicion, int ndatos)
         {
             string sql = "SP_PRODUCTO_SIMPLE_PAGINACION @posicion,@ndatos,@npaginas out";
@@ -237,43 +347,32 @@ namespace Athanasia.Repositories
             return model;
         }
 
-        public async Task<ProductoSimpleView> FindProductoSimpleAsync(int idproducto)
-        {
-            ProductoSimpleView producto = await this.context.ProductosSimplesView.FirstOrDefaultAsync(p => p.IdProducto == idproducto);
-            return producto;
-        }
-
-        public async Task<List<ProductoSimpleView>> GetProductosSimplesViewAsync()
-        {
-            List<ProductoSimpleView> productosSimples = await this.context.ProductosSimplesView.ToListAsync();
-            return productosSimples;
-        }
-
-        public async Task<List<ProductoSimpleView>> GetProductoSimplesViewAsync()
-        {
-            string sql = "SP_PRODUCTOS";
-            var consulta = this.context.ProductosSimplesView.FromSqlRaw(sql);
-            return await consulta.ToListAsync();
-        }
-
-        public async Task<List<ProductoSimpleView>> FindProductosSimplesViewAsync(string palabra)
+        public async Task<PaginacionModel<ProductoSimpleView>> GetAllProductoSimpleViewSearchPaginacionAsync(string palabra, int posicion, int ndatos)
         {
             if (palabra == null)
             {
-                return await this.GetProductoSimplesViewAsync();
+                palabra = "";
             }
-            else
+            string busqueda = palabra.Limpiar();
+            string sql = "SP_SEARCH_PRODUCTOS @busqueda,@posicion,@ndatos,@npaginas out";
+            SqlParameter parambusqueda = new SqlParameter("@busqueda", "%" + busqueda + "%");
+            SqlParameter paramposicion = new SqlParameter("@posicion", posicion);
+            SqlParameter paramndatos = new SqlParameter("@ndatos", ndatos);
+            SqlParameter paramnpaginas = new SqlParameter("@npaginas", -1);
+            paramnpaginas.Direction = ParameterDirection.Output;
+            var consulta = this.context.ProductosSimplesView.FromSqlRaw(sql, parambusqueda, paramposicion, paramndatos, paramnpaginas);
+            List<ProductoSimpleView> productos = await consulta.ToListAsync();
+            int registros = int.Parse(paramnpaginas.Value.ToString());
+            PaginacionModel<ProductoSimpleView> model = new PaginacionModel<ProductoSimpleView>
             {
+                Lista = productos,
+                NumeroPaginas = registros
+            };
+            return model;
 
-                string busqueda = palabra.Limpiar();
-                string sql = "SP_SEARCH_PRODUCTOS @busqueda";
-                SqlParameter parambusqueda = new SqlParameter("@busqueda", "%" + busqueda + "%");
-                var consulta = this.context.ProductosSimplesView.FromSqlRaw(sql, parambusqueda);
-                return await consulta.ToListAsync();
-            }
         }
 
-        public async Task<List<ProductoSimpleView>> FindProductosSimplesViewByIds(List<int> idsproductos)
+        public async Task<List<ProductoSimpleView>> GetAllProductoSimpleViewByIds(List<int> idsproductos)
         {
             if (idsproductos == null || idsproductos.Count == 0)
             {
@@ -288,6 +387,35 @@ namespace Athanasia.Repositories
             }
         }
 
+        public async Task<PaginacionModel<ProductoSimpleView>> GetProductoSimpleViewsCategoriasGeneroAsync(string palabra, int posicion, int ndatos, List<int> idscategorias, List<int> idsgeneros)
+        {
+            string categorias = String.Join(",", idscategorias);
+            string generos = String.Join(",", idsgeneros);
+            if (palabra == null)
+            {
+                palabra = "";
+            }
+            string busqueda = palabra.Limpiar();
+            string sql = "SP_SEARCH_PRODUCTOS_FILTRO @busqueda,@posicion,@ndatos,@categorias,@generos,@npaginas out";
+            SqlParameter parambusqueda = new SqlParameter("@busqueda", "%" + busqueda + "%");
+            SqlParameter paramposicion = new SqlParameter("@posicion", posicion);
+            SqlParameter paramndatos = new SqlParameter("@ndatos", ndatos);
+            SqlParameter paramcategorias = new SqlParameter("@categorias", categorias);
+            SqlParameter paramgeneros = new SqlParameter("@generos", generos);
+            SqlParameter paramnpaginas = new SqlParameter("@npaginas", -1);
+            paramnpaginas.Direction = ParameterDirection.Output;
+            var consulta = this.context.ProductosSimplesView.FromSqlRaw(sql, parambusqueda, paramposicion, paramndatos, paramcategorias, paramgeneros, paramnpaginas);
+            List<ProductoSimpleView> productos = await consulta.ToListAsync();
+            int registros = int.Parse(paramnpaginas.Value.ToString());
+            PaginacionModel<ProductoSimpleView> model = new PaginacionModel<ProductoSimpleView>
+            {
+                Lista = productos,
+                NumeroPaginas = registros
+            };
+            return model;
+        }
+
+
         #endregion
 
         #region USUARIO
@@ -295,6 +423,21 @@ namespace Athanasia.Repositories
         {
             return await this.context.Usuarios.FirstOrDefaultAsync(u => u.IdUsuario == idusuario);
         }
+
+        public async Task<Usuario> UpdateUsuarioAsync(int idusuario, string nombre, string apellido, string email, string? imagen)
+        {
+            Usuario usuario = await this.FindUsuarioByIdAsync(idusuario);
+            usuario.Nombre = nombre;
+            usuario.Apellido = apellido;
+            usuario.Email = email;
+            if (imagen != null)
+            {
+                usuario.Imagen = imagen;
+            }
+            await this.context.SaveChangesAsync();
+            return usuario;
+        }
+
         public async Task<int> DeleteUsuarioAsync(int idusuario)
         {
             Usuario usuario = await this.FindUsuarioByIdAsync(idusuario);
@@ -366,6 +509,16 @@ namespace Athanasia.Repositories
             }
         }
 
+
+        public async Task<Usuario> UpdateUsuarioPasswordAsync(int idusuario, string password)
+        {
+            Usuario usuario = await this.context.Usuarios.FirstOrDefaultAsync(u => u.IdUsuario == idusuario);
+            usuario.Salt = HelperTools.GenerateSalt();
+            usuario.Pass = HelperCryptography.EncryptPassword(password, usuario.Salt);
+            await this.context.SaveChangesAsync();
+            return usuario;
+        }
+
         #endregion
 
         #region PEDIDO
@@ -402,6 +555,33 @@ namespace Athanasia.Repositories
 
         #endregion
 
+        #region CATEGORIAS
+
+        public async Task<List<Categoria>> GetAllCategoriasAsync()
+        {
+            return await this.context.Categorias.ToListAsync();
+        }
+
+        #endregion
+
+        #region GENEROS
+
+        public async Task<List<Genero>> GetAllGenerosAsync()
+        {
+            string sql = "SP_GENEROS";
+            return await this.context.Generos.FromSqlRaw(sql).ToListAsync();
+        }
+
+        #endregion
+
+        #region FORMATOS_LIBRO_VIEW
+
+        public async Task<List<FormatoLibroView>> GetAllFormatoLibroViewByIdLibroAsync(int idlibro)
+        {
+            return await this.context.FormatosLibroView.Where(f => f.IdLibro == idlibro).ToListAsync();
+        }
+
+        #endregion
         #region 
         #endregion
 

@@ -10,6 +10,8 @@ namespace Athanasia.Models.Views
         [Key]
         [Column("ID_PRODUCTO")]
         public int IdProducto { get; set; }
+        [Column("ID_LIBRO")]
+        public int IdLibro { get; set; }
         [Column("TITULO")]
         public string Titulo { get; set; }
         [Column("SINOPSIS")]

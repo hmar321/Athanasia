@@ -6,6 +6,7 @@ using Athanasia.Models.Util;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using static NuGet.Packaging.PackagingConstants;
 
 namespace Athanasia.Controllers
 {
@@ -77,10 +78,33 @@ namespace Athanasia.Controllers
         }
 
         [AuthorizeUsuarios]
-        public IActionResult Perfil()
+        public async Task<IActionResult> Perfil()
         {
             return View();
         }
+
+        public async Task<IActionResult> Editar(int idusuario)
+        {
+            Usuario usuario = await this.repo.FindUsuarioByIdAsync(idusuario);
+            return View(usuario);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Editar(int idusuario, string nombre, string apellido, string email, IFormFile? fichero)
+        {
+            string imagen = null;
+            if (fichero != null)
+            {
+                string path = this.helperPathProvider.MapPath(fichero.FileName, FoldersImages.Usuarios);
+                using (Stream stream = new FileStream(path, FileMode.Create))
+                {
+                    await fichero.CopyToAsync(stream);
+                }
+                imagen = fichero.FileName;
+            }
+            Usuario usuario = await this.repo.UpdateUsuarioAsync(idusuario, nombre, apellido, email, imagen);
+            return RedirectToAction("Perfil");
+        }
+
         [AuthorizeUsuarios]
         public async Task<IActionResult> Compras()
         {

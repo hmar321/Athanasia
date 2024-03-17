@@ -4,6 +4,7 @@ using Athanasia.Models.Tables;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using System.Security.Claims;
 
 namespace Athanasia.Controllers
 {
@@ -21,6 +22,7 @@ namespace Athanasia.Controllers
         [AuthorizeUsuarios]
         public IActionResult RealizarPedido()
         {
+            int idusuario = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             return View();
 
