@@ -17,8 +17,12 @@ namespace Athanasia.Controllers
             this.repo = repo;
         }
 
-        public IActionResult Login()
+        public async Task<IActionResult> Login(string? token)
         {
+            if (token!=null)
+            {
+                await this.repo.ActivarUsuarioAsync(token);
+            }
             return View();
         }
         [HttpPost]

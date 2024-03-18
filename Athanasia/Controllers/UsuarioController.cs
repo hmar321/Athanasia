@@ -6,6 +6,7 @@ using Athanasia.Models.Util;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using System.Security.Claims;
 using static NuGet.Packaging.PackagingConstants;
 
 namespace Athanasia.Controllers
@@ -58,17 +59,19 @@ namespace Athanasia.Controllers
             string mensaje = "<h3>Usuario registrado<h3>";
             mensaje += "<p>Puede activar su cuenta pulsando el siguiente enlace:</p>";
             mensaje += "<a href='" + serverUrl + "'>" + serverUrl + "</a>";
-            try
-            {
-                await this.helperMail.SendMailAsync(email, "Activación cuenta[NO REPLY]", mensaje);
-                ViewData["MENSAJE"] = "Usuario registrado correctamente, activa tu cuenta desde tu correo";
-            }
-            catch (Exception)
-            {
-                ViewData["REGISTROUSUARIO"] = info;
-                ViewData["ERROR"] = "Error al enviar correo";
-                //await this.repo.DeleteUsuarioAsync(usuario.IdUsuario);
-            }
+            //try
+            //{
+            //    await this.helperMail.SendMailAsync(email, "Activación cuenta[NO REPLY]", mensaje);
+            //    ViewData["MENSAJE"] = "Usuario registrado correctamente, activa tu cuenta desde tu correo";
+            //}
+            //catch (Exception)
+            //{
+            //    ViewData["REGISTROUSUARIO"] = info;
+            //    ViewData["ERROR"] = "Error al enviar correo";
+            //    //await this.repo.DeleteUsuarioAsync(usuario.IdUsuario);
+            //}
+            ViewData["ERROR"] = "Correo bloqueado";
+            ViewData["URL"] = serverUrl;
             return View();
         }
 
@@ -102,6 +105,8 @@ namespace Athanasia.Controllers
                 imagen = fichero.FileName;
             }
             Usuario usuario = await this.repo.UpdateUsuarioAsync(idusuario, nombre, apellido, email, imagen);
+            //editar los claims cuando no me de error lo del fichero del formulario
+
             return RedirectToAction("Perfil");
         }
 
@@ -111,5 +116,63 @@ namespace Athanasia.Controllers
 
             return View();
         }
+
+        [AuthorizeUsuarios]
+        public async Task<IActionResult> ResetPass()
+        {
+            string email = HttpContext.User.FindFirst(ClaimTypes.Email).Value;
+            int idusuario = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            Usuario usuario = await this.repo.UpdateUsuarioTokenAsync(idusuario);
+            string serverUrl = this.helperPathProvider.MapUrlServerPath();
+            serverUrl = serverUrl + "/Usuario/CambioPassword?token=" + usuario.Token;
+            string mensaje = "<h3>Cambio de contraseña<h3>";
+            mensaje += "<p>Para cambiar de contraseña pulse en el siguiente enlace:</p>";
+            mensaje += "<a href='" + serverUrl + "'>" + serverUrl + "</a>";
+            //try
+            //{
+            //    await this.helperMail.SendMailAsync(email, "Cambio contraseña[NO REPLY]", mensaje);
+            //    ViewData["MENSAJE"] = "Se te ha enviado un correo";
+            //}
+            //catch (Exception)
+            //{
+            //    ViewData["MENSAJE"] = "Error al enviar correo";
+            //}
+            ViewData["MENSAJE"] = "Error al enviar correo";
+            ViewData["URL"] = serverUrl;
+            return View("Perfil");
+        }
+
+
+        [AuthorizeUsuarios]
+        public async Task<IActionResult> CambioPassword(string token)
+        {
+            Usuario usuario = await this.repo.GetUsuarioByTokenAsync(token);
+            if (usuario != null)
+            {
+                return View();
+            }
+            else
+            {
+                ViewData["MENSAJE"] = "No se ha podido cambiar la contraseña";
+                return RedirectToAction("Perfil");
+            }
+        }
+        [HttpPost]
+        [AuthorizeUsuarios]
+        public async Task<IActionResult> CambioPassword(string password, string password2)
+        {
+            if (password==password2)
+            {
+                int idusuario = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                await this.repo.UpdateUsuarioPasswordAsync(idusuario, password);
+                return RedirectToAction("Logout", "Managed");
+            }
+            else
+            {
+                ViewData["MENSAJE"] ="La contraseña no es la misma";
+                return View();
+            }
+        }
+
     }
 }

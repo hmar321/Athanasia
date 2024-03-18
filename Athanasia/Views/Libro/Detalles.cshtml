@@ -6,6 +6,22 @@
 @section styles {
     <link rel="stylesheet" href="~/css/LibroDetalles.css" />
 }
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            $("#liboton").on('click', 'button', function () {
+                var id = $(this).val();
+                var request = "/Libro/_IconoCarrito?idproducto=" + id + "&agregar=true";
+                $("#liboton").load(request);
+            });
+            $("#liboton button").each(function () {
+                var id = $(this).val();
+                var request = "/Libro/_IconoCarrito?idproducto=" + id + "&agregar=false";
+                $("#liboton").load(request);
+            });
+        });
+    </script>
+}
 <div class="d-flex flex-column align-items-center">
 
     @if (Model == null)
@@ -41,6 +57,10 @@
                                     }
                                 }
                             </div>
+                        </li>
+                        <li id="liboton" class="list-group-item">
+                            <button class="btn btn-secondary d-flex flex-column justify-content-center align-items-center" value="@Model.IdProducto">
+                            </button>
                         </li>
                         <li class="list-group-item">
                             Precio :

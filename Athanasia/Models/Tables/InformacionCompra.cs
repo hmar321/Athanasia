@@ -9,6 +9,8 @@ namespace Athanasia.Models.Tables
         [Key]
         [Column("ID_INFORMACION_COMPRA")]
         public int IdInformacionCompra { get; set; }
+        [Column("NOMBRE")]
+        public string? Nombre { get; set; }
         [Column("DIRECCION")]
         public string? Direccion { get; set; }
         [Column("INDICACCIONES")]

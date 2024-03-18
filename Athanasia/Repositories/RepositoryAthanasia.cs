@@ -484,7 +484,6 @@ namespace Athanasia.Repositories
             await this.context.SaveChangesAsync();
             return user;
         }
-
         public async Task<Usuario> LogInUserAsync(string email, string password)
         {
             Usuario usuario = await this.context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
@@ -507,6 +506,25 @@ namespace Athanasia.Repositories
                     return null;
                 }
             }
+        }
+
+        public async Task<Usuario> UpdateUsuarioTokenAsync(int idusuario)
+        {
+            Usuario usuario = await this.FindUsuarioByIdAsync(idusuario);
+            usuario.Token = HelperTools.GenerateTokenMail();
+            await this.context.SaveChangesAsync();
+            return usuario;
+        }
+
+        public async Task<Usuario> GetUsuarioByTokenAsync(string token)
+        {
+            Usuario usuario = await this.context.Usuarios.FirstOrDefaultAsync(u => u.Token == token);
+            if (usuario != null)
+            {
+                usuario.Token = "";
+                await this.context.SaveChangesAsync();
+            }
+            return usuario;
         }
 
 
@@ -582,6 +600,16 @@ namespace Athanasia.Repositories
         }
 
         #endregion
+
+        #region INFORMACION_COMPRA
+
+        public async Task<List<InformacionCompra>> GetAllInformacionComprabyIdUsuarioAsync(int idusuario)
+        {
+            return await this.context.InformacionesCompra.Where(ic => ic.IdUsuario == idusuario).ToListAsync();
+        }
+
+        #endregion
+
         #region 
         #endregion
 

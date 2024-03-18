@@ -20,10 +20,10 @@ namespace Athanasia.Controllers
         }
 
         [AuthorizeUsuarios]
-        public IActionResult RealizarPedido()
+        public async Task<IActionResult> Comprar()
         {
             int idusuario = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
+            //InformacionCompra infoUsuario=await this.repo
             return View();
 
         }

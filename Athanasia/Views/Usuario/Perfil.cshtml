@@ -30,7 +30,12 @@
             @email
         </dd>
     </dl>
-    <div>
-        <a asp-controller="Usuario" asp-action="Editar" asp-route-idusuario="@idusuario" class="btn btn-dark">Editar</a>
+    <div class="col-md-5">
+        <div class="d-flex flex-row justify-content-between">
+            <a asp-controller="Usuario" asp-action="Editar" asp-route-idusuario="@idusuario" class="btn btn-dark">Editar</a>
+            <a asp-controller="Usuario" asp-action="ResetPass" asp-route-idusuario="@idusuario" class="btn btn-dark">Cambiar contraseña</a>
+        </div>
     </div>
+    <h4>@ViewData["MENSAJE"]</h4>
+    <a href="@ViewData["URL"]">@ViewData["URL"]</a>
 </div>

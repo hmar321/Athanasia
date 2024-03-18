@@ -38,6 +38,7 @@
             <th style="border-radius:0.35rem 0 0 0;">
                 <h4>Productos</h4>
             </th>
+            <th></th>
             <th style="border-radius: 0 0.35rem 0 0;">
                 <h5>Precio</h5>
             </th>
@@ -60,13 +61,16 @@
             {
                 precioTotal += producto.Precio * producto.Unidades;
                 <tr>
-                    <td>
+                    <td colspan="2">
                         <div class="d-flex flex-wrap">
                             <img src="~/images/portadas/@producto.Portada" class="rounded" style="height:20rem;width:13rem;">
 
                             <div class="d-flex flex-column gap-3 m-4">
-                                <h4>@producto.Titulo</h4>
+                                <a class="text-decoration-none" asp-controller="Libro" asp-action="Detalles" asp-route-idproducto="@producto.IdProducto">
+                                    <h3 class="text-primary">@producto.Titulo</h3>
+                                </a>
                                 <h5>@producto.Autor</h5>
+                                <h5 class="text-muted">@producto.Formato</h5>
                                 <div class="d-flex flex-wrap align-items-start">
                                     <button value="@producto.Precio" data-valor="-1" data-unidades="@producto.Unidades" data-idproducto="@producto.IdProducto" class="btn btn-secondary">
                                         -
@@ -94,9 +98,11 @@
             }
             <tr>
                 <td></td>
-                <td class="d-flex flex-row justify-content-around">
+                <td class="">
                     <h5>Subtotal (@productos.Count productos): <span id="totalcarrito">@precioTotal</span>€</h5>
-                    <a asp-controller="Pedido" asp-action="RealizarPedido" class="btn btn-success">Comprar</a>
+                </td>
+                <td>
+                    <a asp-controller="Pedido" asp-action="Comprar" class="btn btn-success">Comprar</a>
                 </td>
             </tr>
         }
