@@ -13,7 +13,7 @@ namespace Athanasia.Models.Tables
         public string? Nombre { get; set; }
         [Column("DIRECCION")]
         public string? Direccion { get; set; }
-        [Column("INDICACCIONES")]
+        [Column("INDICACIONES")]
         public string? Indicaciones { get; set; }
         [Column("ID_METODO_PAGO")]
         public int? IdMetodoPago { get; set; }

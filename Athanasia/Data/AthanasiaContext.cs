@@ -31,5 +31,6 @@ namespace Athanasia.Data
         public DbSet<ProductoView> ProductosView { get; set; }
         public DbSet<ProductoSimpleView> ProductosSimplesView { get; set; }
         public DbSet<FormatoLibroView> FormatosLibroView { get; set; }
+        public DbSet<InformacionCompraView> InformacionesCompraView { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using Athanasia.Filters;
 using Athanasia.Helpers;
 using Athanasia.Models.Tables;
 using Athanasia.Models.Util;
+using Athanasia.Models.Views;
 using Athanasia.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -107,7 +108,7 @@ namespace Athanasia.Controllers
             Usuario usuario = await this.repo.UpdateUsuarioAsync(idusuario, nombre, apellido, email, imagen);
             //editar los claims cuando no me de error lo del fichero del formulario
 
-            return RedirectToAction("Perfil");
+            return RedirectToAction("Logout", "Managed");
         }
 
         [AuthorizeUsuarios]
@@ -161,7 +162,7 @@ namespace Athanasia.Controllers
         [AuthorizeUsuarios]
         public async Task<IActionResult> CambioPassword(string password, string password2)
         {
-            if (password==password2)
+            if (password == password2)
             {
                 int idusuario = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 await this.repo.UpdateUsuarioPasswordAsync(idusuario, password);
@@ -169,10 +170,40 @@ namespace Athanasia.Controllers
             }
             else
             {
-                ViewData["MENSAJE"] ="La contraseña no es la misma";
+                ViewData["MENSAJE"] = "La contraseña no es la misma";
                 return View();
             }
         }
 
+        [AuthorizeUsuarios]
+        public async Task<IActionResult> MetodosPago()
+        {
+            int idusuario = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            List<InformacionCompraView> info = await this.repo.GetAllInformacionCompraViewByIdUsuarioAsync(idusuario);
+            return View(info);
+        }
+        [AuthorizeUsuarios]
+        public async Task<IActionResult> AddMetodoPago()
+        {
+            ViewData["METODOSPAGO"] = await this.repo.GetMetodoPagosAsync();
+            return View();
+        }
+        [AuthorizeUsuarios]
+        [HttpPost]
+        public async Task<IActionResult> AddMetodoPago(InformacionCompra info)
+        {
+            if (info.Indicaciones==null)
+            {
+                info.Indicaciones = "";
+            }
+            await this.repo.InsertInformacionAsync(info.Nombre, info.Direccion, info.Indicaciones, info.IdMetodoPago.Value, info.IdUsuario.Value);
+            return RedirectToAction("MetodosPago");
+        }
+
+        public async Task<IActionResult> EliminarInformacionCompra(int idmetodopago)
+        {
+            await this.repo.DeleteInformacionCompraByIdAsync(idmetodopago);
+            return RedirectToAction("MetodosPago");
+        }
     }
 }

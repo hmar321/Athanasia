@@ -1,5 +1,5 @@
 ﻿@{
-    List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
+    List<ProductoSimpleView> productos = memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
     double precioTotal = 0;
     double precioVarios = 0;
 }
@@ -49,7 +49,7 @@
         {
 
             <tr>
-                <td colspan="2" class="p-4">
+                <td colspan="3" class="p-4">
                     <h6>No tienes productos en el carrito</h6>
                 </td>
             </tr>

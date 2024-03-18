@@ -99,6 +99,18 @@ using System.Diagnostics.Metrics;
 //select ISNULL(ID_PRODUCTO,-1) ID_PRODUCTO, ID_LIBRO, f.NOMBRE FORMATO from PRODUCTO p
 //inner join FORMATO f on f.ID_FORMATO=p.ID_FORMATO
 
+//alter view V_INFORMACION_COMPRA_USUARIO as
+//select 
+//ISNULL(ic.ID_INFORMACION_COMPRA,-1) ID_INFORMACION_COMPRA,
+//ic.NOMBRE,
+//ic.DIRECCION,
+//ic.INDICACIONES,
+//ic.ID_METODO_PAGO,
+//mp.NOMBRE METODO_PAGO,
+//ic.ID_USUARIO
+//from INFORMACION_COMPRA ic
+//inner join METODO_PAGO mp on ic.ID_METODO_PAGO=mp.ID_METODO_PAGO
+
 #endregion
 
 #region FUNCTIONS
@@ -540,12 +552,24 @@ namespace Athanasia.Repositories
         #endregion
 
         #region PEDIDO
-
+        public int GetPedidoNextId()
+        {
+            int nextid = -1;
+            if (this.context.Pedidos.Count() == 0)
+            {
+                nextid = 1;
+            }
+            else
+            {
+                nextid = this.context.Pedidos.Max(o => o.IdPedido);
+            }
+            return nextid;
+        }
         public async Task<Pedido> InsertPedidoAsync()
         {
             //id procesando
             int estadopedido = 2;
-            int nextid = this.context.Pedidos.Max(o => o.IdPedido);
+            int nextid = GetPedidoNextId();
             Pedido pedido = new Pedido
             {
                 IdPedido = nextid,
@@ -554,7 +578,9 @@ namespace Athanasia.Repositories
                 FechaEntrega = null,
                 IdEstadoPedido = estadopedido
             };
-            return null;
+            await this.context.Pedidos.AddAsync(pedido);
+            await this.context.SaveChangesAsync();
+            return pedido;
         }
 
         #endregion
@@ -605,9 +631,76 @@ namespace Athanasia.Repositories
 
         public async Task<List<InformacionCompra>> GetAllInformacionComprabyIdUsuarioAsync(int idusuario)
         {
-            return await this.context.InformacionesCompra.Where(ic => ic.IdUsuario == idusuario).ToListAsync();
+            List<InformacionCompra> info = await this.context.InformacionesCompra.Where(ic => ic.IdUsuario == idusuario).ToListAsync();
+            if (info.Count == 0)
+            {
+                return null;
+            }
+            return info;
         }
 
+        public async Task<int> GetNextIdInformacionCompraAsync()
+        {
+            if (this.context.InformacionesCompra.Count() == 0)
+            {
+                return 1;
+            }
+            else
+            {
+                return await this.context.InformacionesCompra.MaxAsync(u => u.IdInformacionCompra) + 1;
+            }
+        }
+
+        public async Task<InformacionCompra> InsertInformacionAsync(string nombre, string direccion, string indicaciones, int idmetodopago, int idusuario)
+        {
+            int nextid = await this.GetNextIdInformacionCompraAsync();
+            InformacionCompra info = new InformacionCompra
+            {
+                IdInformacionCompra = nextid,
+                Nombre = nombre,
+                Direccion = direccion,
+                Indicaciones = indicaciones,
+                IdMetodoPago = idmetodopago,
+                IdUsuario = idusuario
+            };
+            await this.context.InformacionesCompra.AddAsync(info);
+            await this.context.SaveChangesAsync();
+            return info;
+        }
+
+        public async Task<InformacionCompra> GetInformacionCompraByIdAsync(int id)
+        {
+            return this.context.InformacionesCompra.FirstOrDefault(ic => ic.IdInformacionCompra == id);
+        }
+
+        public async Task<int> DeleteInformacionCompraByIdAsync(int idinfocompra)
+        {
+            InformacionCompra info = await this.GetInformacionCompraByIdAsync(idinfocompra);
+            this.context.Remove(info);
+            return await this.context.SaveChangesAsync();
+        }
+
+        #endregion
+
+        #region METODO_PAGO
+
+        public async Task<List<MetodoPago>> GetMetodoPagosAsync()
+        {
+            return await this.context.MetodosPago.ToListAsync();
+        }
+
+        #endregion
+
+        #region INFORMACION_COMPRA_VIEW
+
+        public async Task<List<InformacionCompraView>> GetAllInformacionCompraViewByIdUsuarioAsync(int idusuario)
+        {
+            if (this.context.InformacionesCompraView == null)
+            {
+                return new List<InformacionCompraView>();
+            }
+            return await this.context.InformacionesCompraView.Where(dp => dp.IdUsuario == idusuario).ToListAsync();
+        }
         #endregion
 
         #region 

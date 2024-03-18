@@ -1,5 +1,10 @@
 ﻿@{
     List<ProductoSimpleView> productos = memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
+    List<InformacionCompraView> metodosPago = ViewData["INFOCOMPRAUSUARIO"] as List<InformacionCompraView>;
+    if (productos == null)
+    {
+        productos = new List<ProductoSimpleView>();
+    }
     double precioTotal = 0;
 }
 <div class="card bg-light p-4">
@@ -7,8 +12,10 @@
     <form method="post">
         <label>Selecciona un metodo de pago</label>
         <select name="metodopago" class="form-select mb-3" style="width:20rem;">
-            <option>Mi tarjeta pago</option>
-            <option>tarjeta expirada que me da pereza borrar</option>
+            @foreach (InformacionCompraView ic in metodosPago)
+            {
+                <option value="@ic.IdInformacionCompra">@ic.Nombre</option>
+            }
         </select>
         <h4>Resumen</h4>
         <table class="table " style="max-width:60rem;width:70vw;">
@@ -24,38 +31,50 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (ProductoSimpleView prod in productos)
+                @if (productos.Count == 0)
                 {
-                    precioTotal += prod.Precio * prod.Unidades;
                     <tr>
-                        <td class="text-center">
-                            <img src="~/images/portadas/@prod.Portada" class="rounded" style="width:5rem;height:7rem;" />
-                        </td>
-                        <td class="text-center align-middle">
-                            @prod.Titulo
-                        </td>
-                        <td class="text-center align-middle">
-                            @prod.Autor
-                        </td>
-                        <td class="text-center align-middle">
-                            @prod.Formato
-                        </td>
-                        <td class="text-center align-middle">
-                            @prod.Precio€
-                        </td>
-                        <td class="text-center align-middle">
-                            @prod.Unidades
-                        </td>
-                        <td class="text-center align-middle">
-                            @(prod.Precio * prod.Unidades)€
-                        </td>
+                        <td colspan="7">No tienes productos</td>
                     </tr>
                 }
-                <tr>
-                    <td colspan="7" class="text-end"><h6>Precio total: @precioTotal€</h6></td>
-                </tr>
+                else
+                {
+                    foreach (ProductoSimpleView prod in productos)
+                    {
+                        precioTotal += prod.Precio * prod.Unidades;
+                        <tr>
+                            <td class="text-center">
+                                <img src="~/images/portadas/@prod.Portada" class="rounded" style="width:5rem;height:7rem;" />
+                            </td>
+                            <td class="text-center align-middle">
+                                @prod.Titulo
+                            </td>
+                            <td class="text-center align-middle">
+                                @prod.Autor
+                            </td>
+                            <td class="text-center align-middle">
+                                @prod.Formato
+                            </td>
+                            <td class="text-center align-middle">
+                                @prod.Precio€
+                            </td>
+                            <td class="text-center align-middle">
+                                @prod.Unidades
+                            </td>
+                            <td class="text-center align-middle">
+                                @(prod.Precio * prod.Unidades)€
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td colspan="7" class="text-end"><h6>Precio total: @precioTotal€</h6></td>
+                    </tr>
+                }
             </tbody>
         </table>
-        <button class="btn btn-success">Realizar pedido</button>
+        @if (productos.Count != 0)
+        {
+            <button class="btn btn-success">Realizar pedido</button>
+        }
     </form>
 </div>
