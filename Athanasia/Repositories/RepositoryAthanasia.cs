@@ -12,7 +12,41 @@ using System.Data;
 using System.Diagnostics.Metrics;
 
 #region VIEWS
-//alter view V_PRODUCTO as
+//create view V_PEDIDO_PRODUCTO as
+//select 
+//ISNULL(pp.ID_PEDIDO_PRODUCTO,-1) ID_PEDIDO_PRODUCTO,
+//l.ID_LIBRO,
+//l.TITULO,
+//l.PORTADA,
+//ISNULL(a.NOMBRE, 'Desconocido') AUTOR,
+//p.ID_FORMATO,
+//f.NOMBRE FORMATO,
+//pp.UNIDADES,
+//p.PRECIO,
+//pp.ID_PEDIDO,
+//pp.ID_PRODUCTO
+//from PEDIDOS_PRODUCTOS pp
+//inner join PRODUCTO p on pp.ID_PRODUCTO=p.ID_PRODUCTO
+//inner join FORMATO f on p.ID_FORMATO=f.ID_FORMATO
+//inner join LIBRO l on p.ID_LIBRO=l.ID_LIBRO
+//left join AUTOR a on l.ID_AUTOR=a.ID_AUTOR
+
+//create view V_PEDIDO as
+//select 
+//p.ID_PEDIDO,
+//p.ID_USUARIO,
+//p.FECHA_SOLICITUD,
+//P.FECHA_ESTIMADA,
+//ep.NOMBRE ESTADO_PEDIDO,
+//STRING_AGG(l.TITULO, ', ') LIBROS
+//from PEDIDO p
+//inner join ESTADO_PEDIDO ep on p.ID_ESTADO_PEDIDO=ep.ID_ESTADO_PEDIDO
+//inner join PEDIDOS_PRODUCTOS pp on p.ID_PEDIDO=pp.ID_PEDIDO
+//inner join PRODUCTO pr on pp.ID_PRODUCTO=pr.ID_PRODUCTO
+//inner join LIBRO l on pr.ID_LIBRO=L.ID_LIBRO
+//GROUP BY p.ID_PEDIDO, p.ID_USUARIO, p.FECHA_SOLICITUD, P.FECHA_ESTIMADA, ep.NOMBRE
+
+//create view V_PRODUCTO as
 //select
 //	ISNULL(p.ID_PRODUCTO, - 1) ID_PRODUCTO,
 //    l.ID_LIBRO,
@@ -44,7 +78,7 @@ using System.Diagnostics.Metrics;
 
 
 
-//alter view V_PRODUCTO_SIMPLE as
+//create view V_PRODUCTO_SIMPLE as
 //select
 //    ISNULL(p.ID_PRODUCTO, -1) ID_PRODUCTO,
 //    l.ID_LIBRO,
@@ -76,10 +110,11 @@ using System.Diagnostics.Metrics;
 //inner join FORMATO f on pr.ID_FORMATO=f.ID_FORMATO
 //inner join LIBRO l on pr.ID_LIBRO=l.ID_LIBRO
 
-//alter view V_PRODUCTO_BUSCADO as
+//create view V_PRODUCTO_BUSCADO as
 //select
 //    ISNULL(p.ID_PRODUCTO, -1) ID_PRODUCTO,
 //    l.TITULO,
+//    l.ID_LIBRO,
 //    l.PORTADA,
 //    a.NOMBRE AUTOR,
 //    p.PRECIO,
@@ -87,19 +122,21 @@ using System.Diagnostics.Metrics;
 //    f.NOMBRE FORMATO,
 //    G.ID_GENERO,
 //    l.ID_CATEGORIA,
-//	1 UNIDADES
+//	1 UNIDADES,
+//    s.NOMBRE SAGA
 //from Libro l
 //left join AUTOR a on l.ID_AUTOR=a.ID_AUTOR and l.TITULO is not null and a.NOMBRE is not null
 //inner join PRODUCTO p on l.ID_LIBRO=p.ID_LIBRO and p.PRECIO is not null
 //inner join FORMATO f on p.ID_FORMATO=f.ID_FORMATO and f.NOMBRE is not null
 //inner join GENEROS_LIBROS gl on l.ID_LIBRO=gl.ID_LIBRO
 //inner join GENERO g on gl.ID_GENERO=g.ID_GENERO
+//left join SAGA s on l.ID_SAGA=s.ID_SAGA
 
-//alter view SP_FORMATO_LIBRO as
+//create view SP_FORMATO_LIBRO as
 //select ISNULL(ID_PRODUCTO,-1) ID_PRODUCTO, ID_LIBRO, f.NOMBRE FORMATO from PRODUCTO p
 //inner join FORMATO f on f.ID_FORMATO=p.ID_FORMATO
 
-//alter view V_INFORMACION_COMPRA_USUARIO as
+//create view V_INFORMACION_COMPRA_USUARIO as
 //select 
 //ISNULL(ic.ID_INFORMACION_COMPRA,-1) ID_INFORMACION_COMPRA,
 //ic.NOMBRE,
@@ -155,37 +192,48 @@ using System.Diagnostics.Metrics;
 
 #region PROCEDURES
 
-//alter procedure SP_SEARCH_PRODUCTOS
+//create procedure SP_SEARCH_PRODUCTOS
 //(@busqueda nvarchar(255), @posicion int, @ndatos int, @npaginas int out)
 //as
 //	select @npaginas=CEILING(COUNT(ID_PRODUCTO)/CAST(@ndatos AS FLOAT)) from
-//	(select ID_PRODUCTO, ID_LIBRO, TITULO, AUTOR, ROW_NUMBER() over(partition by TITULO, AUTOR order by ID_PRODUCTO) REPETICION
-//	from V_PRODUCTO_SIMPLE) AGRUPADOS
+//		(select ID_PRODUCTO, ID_LIBRO, TITULO, AUTOR, SAGA, ROW_NUMBER() over(partition by TITULO, AUTOR order by ID_PRODUCTO) REPETICION
+//		from
+//			(select distinct ID_PRODUCTO, ID_LIBRO, TITULO, AUTOR, SAGA
+//			from V_PRODUCTO_BUSCADO
+//			) DISTINTOS
+//		) AGRUPADOS
 //	where REPETICION=1
 //	and TITULO is not null
 //	and AUTOR is not null
 //	and dbo.LIMPIAR(TITULO) like @busqueda
 //	or dbo.LIMPIAR(AUTOR) like @busqueda
 //	and REPETICION = 1
+//	or dbo.LIMPIAR(SAGA) like @busqueda
+//	and REPETICION = 1
 //	select ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES
 //	from
 //		(select ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES,
 //        ROW_NUMBER() over (order by ID_PRODUCTO) POSICION
 //		from 
-//			(select ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES,
-//            ROW_NUMBER() over(partition by TITULO, AUTOR order by ID_PRODUCTO) REPETICION
-//			from V_PRODUCTO_SIMPLE) QUERY
+//		(select 
+//		ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES, SAGA,
+//        ROW_NUMBER() over(partition by TITULO, AUTOR order by ID_PRODUCTO) REPETICION
+//		from
+//			(select distinct ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES, SAGA
+//			from V_PRODUCTO_BUSCADO) QUERY) GRUPO
 //		where REPETICION = 1
 //		and TITULO is not null
 //		and AUTOR is not null
 //		and dbo.LIMPIAR(TITULO) like @busqueda
 //		or dbo.LIMPIAR(AUTOR) like @busqueda
+//		and REPETICION = 1
+//		or dbo.LIMPIAR(SAGA) like @busqueda
 //		and REPETICION = 1) QUERY
 //	where POSICION>=@ndatos*@posicion-(@ndatos-1) and POSICION<=@posicion*@ndatos
 //	order by ID_PRODUCTO
 //go
 
-//alter procedure SP_PRODUCTOS
+//create procedure SP_PRODUCTOS
 //as
 //SELECT ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES
 //FROM (
@@ -199,7 +247,7 @@ using System.Diagnostics.Metrics;
 //go
 
 
-//alter procedure SP_PRODUCTO_SIMPLE_PAGINACION
+//create procedure SP_PRODUCTO_SIMPLE_PAGINACION
 //(@posicion int, @ndatos int, @npaginas int out)
 //as
 //	select @npaginas=CEILING(COUNT(ID_PRODUCTO)/CAST(@ndatos AS FLOAT)) from
@@ -219,7 +267,7 @@ using System.Diagnostics.Metrics;
 //	where  POSICION>=@ndatos*@posicion-(@ndatos-1) and POSICION<=@posicion*@ndatos
 //go
 
-//alter procedure SP_GENEROS
+//create procedure SP_GENEROS
 //as
 //	select distinct g.ID_GENERO, g.NOMBRE, g.DESCRIPCION from GENERO g
 //	inner join GENEROS_LIBROS gl on gl.ID_GENERO=g.ID_GENERO
@@ -228,47 +276,36 @@ using System.Diagnostics.Metrics;
 //go
 
 
-//alter procedure SP_INSERT_PEDIDOS_PRODUCTOS
-//(@unidades int, @idpedido int, @idproducto int)
-//as
-//	declare @maxid int
-//	select @maxid=MAX(ID_PEDIDO_PRODUCTO) from PEDIDOS_PRODUCTOS
-
-//	insert into PEDIDOS_PRODUCTOS values
-//	(@maxid, @unidades, @idpedido, @idproducto)
-
-//	select ID_PEDIDO_PRODUCTO, UNIDADES, ID_PEDIDO, ID_PRODUCTO 
-//	from PEDIDOS_PRODUCTOS
-//	where ID_PEDIDO_PRODUCTO=@maxid
-//go
-
-
 //create procedure SP_SEARCH_PRODUCTOS_FILTRO
 //(@busqueda nvarchar(255), @posicion int, @ndatos int, @categorias nvarchar(255), @generos nvarchar(255), @npaginas int out)
 //as
 //	select @npaginas=CEILING(COUNT(ID_PRODUCTO)/CAST(@ndatos AS FLOAT)) from
-//		(select ID_PRODUCTO, TITULO, AUTOR, ROW_NUMBER() over(partition by TITULO, AUTOR order by ID_PRODUCTO) REPETICION
+//		(select ID_PRODUCTO, ID_LIBRO, TITULO, AUTOR, SAGA, ROW_NUMBER() over(partition by TITULO, AUTOR order by ID_PRODUCTO) REPETICION
 //		from
-//			(select distinct ID_PRODUCTO, TITULO, AUTOR
+//			(select distinct ID_PRODUCTO, ID_LIBRO, TITULO, AUTOR, SAGA
 //			from V_PRODUCTO_BUSCADO
 //			where ID_CATEGORIA in (select CAST(value as int) from STRING_SPLIT(@categorias, ','))
-//			and ID_GENERO in (select CAST(value as int) from STRING_SPLIT(@generos, ','))) DISTINTOS) AGRUPADOS
+//			and ID_GENERO in (select CAST(value as int) from STRING_SPLIT(@generos, ','))
+//			) DISTINTOS
+//		) AGRUPADOS
 //	where REPETICION=1
 //	and TITULO is not null
 //	and AUTOR is not null
 //	and dbo.LIMPIAR(TITULO) like @busqueda
 //	or dbo.LIMPIAR(AUTOR) like @busqueda
 //	and REPETICION = 1
-//	select ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES
+//	or dbo.LIMPIAR(SAGA) like @busqueda
+//	and REPETICION = 1
+//	select ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES
 //	from
-//		(select ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES,
+//		(select ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES,
 //        ROW_NUMBER() over (order by ID_PRODUCTO) POSICION
 //		from 
 //		(select 
-//		ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES,
+//		ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES, SAGA,
 //        ROW_NUMBER() over(partition by TITULO, AUTOR order by ID_PRODUCTO) REPETICION
 //		from
-//			(select distinct ID_PRODUCTO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES
+//			(select distinct ID_PRODUCTO, ID_LIBRO, TITULO, PORTADA, AUTOR, PRECIO, ID_FORMATO, FORMATO, UNIDADES, SAGA
 //			from V_PRODUCTO_BUSCADO
 //			where ID_CATEGORIA in (select CAST(value as int) from STRING_SPLIT(@categorias, ','))
 //			and ID_GENERO in (select CAST(value as int) from STRING_SPLIT(@generos, ','))) QUERY) GRUPO
@@ -277,6 +314,8 @@ using System.Diagnostics.Metrics;
 //		and AUTOR is not null
 //		and dbo.LIMPIAR(TITULO) like @busqueda
 //		or dbo.LIMPIAR(AUTOR) like @busqueda
+//		and REPETICION = 1
+//		or dbo.LIMPIAR(SAGA) like @busqueda
 //		and REPETICION = 1) QUERY
 //	where POSICION>=@ndatos*@posicion-(@ndatos-1) and POSICION<=@posicion*@ndatos
 //	order by ID_PRODUCTO
@@ -551,50 +590,31 @@ namespace Athanasia.Repositories
 
         #endregion
 
-        #region PEDIDO
-        public int GetPedidoNextId()
+        #region PEDIDO_PRODUCTO
+
+        public int GetPedidoProductoNextId()
         {
-            int nextid = -1;
-            if (this.context.Pedidos.Count() == 0)
+            if (this.context.PedidosProductos.Count() == 0)
             {
-                nextid = 1;
+                return 1;
             }
             else
             {
-                nextid = this.context.Pedidos.Max(o => o.IdPedido);
+                return this.context.PedidosProductos.Max(pp => pp.IdPedidoProducto) + 1;
+
             }
-            return nextid;
+
         }
-        public async Task<Pedido> InsertPedidoAsync()
+
+        public async Task<int> InsertListPedidoProductosAsync(int idpedido, List<ProductoSimpleView> productos)
         {
-            //id procesando
-            int estadopedido = 2;
-            int nextid = GetPedidoNextId();
-            Pedido pedido = new Pedido
+            int nextId = GetPedidoProductoNextId();
+            foreach (ProductoSimpleView prod in productos)
             {
-                IdPedido = nextid,
-                FechaSolicitud = DateTime.Now,
-                FechaEstimada = DateTime.Now.AddDays(3),
-                FechaEntrega = null,
-                IdEstadoPedido = estadopedido
-            };
-            await this.context.Pedidos.AddAsync(pedido);
-            await this.context.SaveChangesAsync();
-            return pedido;
-        }
-
-        #endregion
-
-        #region PEDIDOS_PRODUCTOS
-
-        public async Task<PedidosProductos> InsertPedidoProductosAsync(int unidades, int idpedido, int idproducto)
-        {
-            string sql = "SP_INSERT_PEDIDOS_PRODUCTOS @unidades,@idpedido,@idproducto";
-            SqlParameter paramunidades = new SqlParameter("@unidades", unidades);
-            SqlParameter paramidpedido = new SqlParameter("@idpedido", idpedido);
-            SqlParameter paramidproducto = new SqlParameter("@idproducto", idproducto);
-            var consulta = this.context.PedidosProductos.FromSqlRaw(sql, paramunidades, paramidpedido, paramidproducto);
-            return await consulta.FirstOrDefaultAsync();
+                await this.context.PedidosProductos.AddAsync(new PedidoProducto { IdPedidoProducto = nextId, Unidades = prod.Unidades, IdPedido = idpedido, IdProducto = prod.IdProducto });
+                nextId++;
+            }
+            return await this.context.SaveChangesAsync();
         }
 
         #endregion
@@ -616,6 +636,10 @@ namespace Athanasia.Repositories
             return await this.context.Generos.FromSqlRaw(sql).ToListAsync();
         }
 
+        public async Task<Genero> GetGeneroByNombreAsync(string nombre)
+        {
+            return await this.context.Generos.FirstOrDefaultAsync(g => g.Nombre == nombre);
+        }
         #endregion
 
         #region FORMATOS_LIBRO_VIEW
@@ -703,6 +727,65 @@ namespace Athanasia.Repositories
         }
         #endregion
 
+        #region PEDIDO
+        public async Task<int> UpdatePedidoEstadoCancelarAsync(int idpedido)
+        {
+            Pedido pedido = await this.context.Pedidos.FirstOrDefaultAsync(p => p.IdPedido == idpedido);
+            //ID DEL ESTADO CANCELADO
+            pedido.IdEstadoPedido = 7;
+            return await this.context.SaveChangesAsync();
+        }
+
+        public int GetPedidoNextId()
+        {
+            int nextid = -1;
+            if (this.context.Pedidos.Count() == 0)
+            {
+                nextid = 1;
+            }
+            else
+            {
+                nextid = this.context.Pedidos.Max(o => o.IdPedido);
+            }
+            return nextid;
+        }
+        public async Task<Pedido> InsertPedidoAsync(int idusuario)
+        {
+            //id procesando
+            int estadopedido = 2;
+            int nextid = GetPedidoNextId();
+            Pedido pedido = new Pedido
+            {
+                IdPedido = nextid,
+                FechaSolicitud = DateTime.Now,
+                FechaEstimada = DateTime.Now.AddDays(3),
+                FechaEntrega = null,
+                IdEstadoPedido = estadopedido,
+                IdUsuario = idusuario
+            };
+            await this.context.Pedidos.AddAsync(pedido);
+            await this.context.SaveChangesAsync();
+            return pedido;
+        }
+
+        #endregion
+
+        #region PEDIDO_VIEW
+
+        public async Task<List<PedidoView>> GetAllPedidoViewByIdUsuario(int idusuario)
+        {
+            return await this.context.PedidosView.Where(p => p.IdUsuario == idusuario).ToListAsync();
+        }
+
+        #endregion
+
+        #region PEDIDOS_PRODUCTO_VIEW
+        public async Task<List<PedidoProductoView>> GetPedidoProductoViewsByIdPedidoAsync(int idpedido)
+        {
+            return await this.context.PedidosProductoView.Where(p => p.IdPedido == idpedido).ToListAsync();
+        }
+
+        #endregion
         #region 
         #endregion
 

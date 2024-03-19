@@ -86,12 +86,13 @@ namespace Athanasia.Controllers
         {
             return View();
         }
-
+        [AuthorizeUsuarios]
         public async Task<IActionResult> Editar(int idusuario)
         {
             Usuario usuario = await this.repo.FindUsuarioByIdAsync(idusuario);
             return View(usuario);
         }
+        [AuthorizeUsuarios]
         [HttpPost]
         public async Task<IActionResult> Editar(int idusuario, string nombre, string apellido, string email, IFormFile? fichero)
         {
@@ -192,18 +193,25 @@ namespace Athanasia.Controllers
         [HttpPost]
         public async Task<IActionResult> AddMetodoPago(InformacionCompra info)
         {
-            if (info.Indicaciones==null)
+            if (info.Indicaciones == null)
             {
                 info.Indicaciones = "";
             }
             await this.repo.InsertInformacionAsync(info.Nombre, info.Direccion, info.Indicaciones, info.IdMetodoPago.Value, info.IdUsuario.Value);
             return RedirectToAction("MetodosPago");
         }
-
+        [AuthorizeUsuarios]
         public async Task<IActionResult> EliminarInformacionCompra(int idmetodopago)
         {
             await this.repo.DeleteInformacionCompraByIdAsync(idmetodopago);
             return RedirectToAction("MetodosPago");
+        }
+        [AuthorizeUsuarios]
+        public async Task<IActionResult> HistorialCompras()
+        {
+            int idusuario = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            List<PedidoView> pedidos = await this.repo.GetAllPedidoViewByIdUsuario(idusuario);
+            return View(pedidos);
         }
     }
 }

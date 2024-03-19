@@ -18,16 +18,32 @@ namespace Athanasia.Controllers
             this.memoryCache = memoryCache;
         }
 
-        public async Task<ActionResult> Index(int? posicion)
+        public async Task<ActionResult> Index(int? posicion, string? busqueda)
         {
             if (posicion == null)
             {
                 posicion = 1;
             }
+            if (busqueda==null)
+            {
+                busqueda = "";
+            }
             int ndatos = 4;
-            PaginacionModel<ProductoSimpleView> model = await this.repo.GetProductosSimplesPaginacionAsyn(posicion.Value, ndatos);
+            PaginacionModel<ProductoSimpleView> model = await this.repo.GetAllProductoSimpleViewSearchPaginacionAsync(busqueda, posicion.Value, ndatos);
             ViewData["POSICION"] = posicion.Value;
             ViewData["PAGINAS"] = model.NumeroPaginas;
+            ViewData["BUSQUEDA"] = busqueda;
+            return View(model.Lista);
+        }
+        [HttpPost]
+        public async Task<ActionResult> Index(string busqueda)
+        {
+            int posicion = 1;
+            int ndatos = 4;
+            PaginacionModel<ProductoSimpleView> model = await this.repo.GetAllProductoSimpleViewSearchPaginacionAsync(busqueda, posicion, ndatos);
+            ViewData["POSICION"] = posicion;
+            ViewData["PAGINAS"] = model.NumeroPaginas;
+            ViewData["BUSQUEDA"] = busqueda;
             return View(model.Lista);
         }
 

@@ -10,7 +10,7 @@
 <div class="card bg-light p-4">
     <h1>Comprar</h1>
     <form method="post">
-        <label>Selecciona un metodo de pago</label>
+        <label>Selecciona un método de pago</label>
         <select name="metodopago" class="form-select mb-3" style="width:20rem;">
             @foreach (InformacionCompraView ic in metodosPago)
             {
@@ -21,13 +21,13 @@
         <table class="table " style="max-width:60rem;width:70vw;">
             <thead>
                 <tr>
-                    <th style="width:7rem;">Portada</th>
-                    <th>Titulo</th>
-                    <th>Autor</th>
-                    <th>Formato</th>
-                    <th>Precio/u</th>
-                    <th>Unidades</th>
-                    <th>Total</th>
+                    <th class="text-center" style="width:7rem;">Portada</th>
+                    <th class="text-center">Titulo</th>
+                    <th class="text-center">Autor</th>
+                    <th class="text-center">Formato</th>
+                    <th class="text-center">Precio/u</th>
+                    <th class="text-center">Unidades</th>
+                    <th class="text-center">Total</th>
                 </tr>
             </thead>
             <tbody>

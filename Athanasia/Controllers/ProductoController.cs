@@ -127,5 +127,18 @@ namespace Athanasia.Controllers
             ViewData["GENEROS"] = geners;
             return View(model.Lista);
         }
+
+        public async Task<IActionResult> LibrosGenero(string genero)
+        {
+            Genero gen = await this.repo.GetGeneroByNombreAsync(genero);
+            if (gen != null)
+            {
+                List<int> lista = new List<int> { gen.IdGenero };
+                this.memoryCache.Remove("FILTROCATEGORIAS");
+                this.memoryCache.Remove("FILTROGENEROS");
+                this.memoryCache.Set("FILTROGENEROS", lista);
+            }
+            return RedirectToAction("Buscador");
+        }
     }
 }

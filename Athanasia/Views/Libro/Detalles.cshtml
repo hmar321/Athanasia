@@ -63,6 +63,10 @@
                             </button>
                         </li>
                         <li class="list-group-item">
+                            Editorial :
+                            <h5>@Model.Editorial</h5>
+                        </li>
+                        <li class="list-group-item">
                             Precio :
                             <h5>@Model.Precio€</h5>
                         </li>
@@ -73,6 +77,14 @@
                         <li class="list-group-item">
                             Formato:
                             <h6>@Model.Formato</h6>
+                        </li>
+                        <li class="list-group-item">
+                            Fecha publicación:
+                            <h6>@Model.FechaPublicacion.Value.ToShortDateString()</h6>
+                        </li>
+                        <li class="list-group-item">
+                            Categoría:
+                            <h6>@Model.Categoria</h6>
                         </li>
                         @if (Model.Saga != null)
                         {
@@ -100,9 +112,6 @@
                     </ul>
                 </div>
             </div>
-        </div>
-        <div class="text-light">
-            Comentarios in development
         </div>
     }
 </div>

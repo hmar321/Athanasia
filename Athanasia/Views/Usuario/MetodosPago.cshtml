@@ -1,10 +1,15 @@
 ﻿@model List<InformacionCompraView>
 <div class="card bg-light p-4">
-    <h2 class="text-primary">Metodos pago</h2>
+    <h2 class="text-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-credit-card-fill" viewBox="0 0 16 16">
+            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1H0zm0 3v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7zm3 2h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1" />
+        </svg>
+        Metodos pago
+    </h2>
     <hr />
     <h5>@ViewData["MENSAJE"]</h5>
     <div class="d-flex flex-wrap gap-3">
-        @if (Model.Count==0)
+        @if (Model.Count == 0)
         {
             <h5>No tienes métodos de pago</h5>
         }

@@ -2,6 +2,7 @@
 @{
     int posicion = (int)ViewData["POSICION"];
     int paginas = (int)ViewData["PAGINAS"];
+    string busqueda = ViewData["BUSQUEDA"].ToString();
 }
 @section scripts {
     <script>
@@ -21,7 +22,7 @@
 }
 <div>
     <div class="d-flex flex-wrap justify-content-center gap-3 mb-4">
-        <a asp-controller="Libro" asp-action="Index" asp-route-posicion="1" class="btn btn-light">
+        <a asp-controller="Libro" asp-action="Index" asp-route-posicion="1" asp-route-busqueda="@busqueda" class="btn btn-light">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
                 <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
@@ -31,18 +32,18 @@
         {
             if (i == posicion)
             {
-                <a asp-controller="Libro" asp-action="Index" asp-route-posicion="@i" class="btn btn-dark fw-bold">
+                <a asp-controller="Libro" asp-action="Index" asp-route-posicion="@i" asp-route-busqueda="@busqueda" class="btn btn-dark fw-bold">
                     @i
                 </a>
             }
             else
             {
-                <a asp-controller="Libro" asp-action="Index" asp-route-posicion="@i" class="btn btn-light">
+                <a asp-controller="Libro" asp-action="Index" asp-route-posicion="@i" asp-route-busqueda="@busqueda" class="btn btn-light">
                     @i
                 </a>
             }
         }
-        <a asp-controller="Libro" asp-action="Index" asp-route-posicion="@paginas" class="btn btn-light">
+        <a asp-controller="Libro" asp-action="Index" asp-route-posicion="@paginas" asp-route-busqueda="@busqueda" class="btn btn-light">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
                 <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
@@ -78,7 +79,7 @@
         }
     </div>
     <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
-        <a asp-controller="Libro" asp-action="Index" asp-route-posicion="1" class="btn btn-light">
+        <a asp-controller="Libro" asp-action="Index" asp-route-posicion="1" asp-route-busqueda="@busqueda" class="btn btn-light">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
                 <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
@@ -88,18 +89,18 @@
         {
             if (i == posicion)
             {
-                <a asp-controller="Libro" asp-action="Index" asp-route-posicion="@i" class="btn btn-dark fw-bold">
+                <a asp-controller="Libro" asp-action="Index" asp-route-posicion="@i" asp-route-busqueda="@busqueda" class="btn btn-dark fw-bold">
                     @i
                 </a>
             }
             else
             {
-                <a asp-controller="Libro" asp-action="Index" asp-route-posicion="@i" class="btn btn-light">
+                <a asp-controller="Libro" asp-action="Index" asp-route-posicion="@i" asp-route-busqueda="@busqueda" class="btn btn-light">
                     @i
                 </a>
             }
         }
-        <a asp-controller="Libro" asp-action="Index" asp-route-posicion="@paginas" class="btn btn-light">
+        <a asp-controller="Libro" asp-action="Index" asp-route-posicion="@paginas" asp-route-busqueda="@busqueda" class="btn btn-light">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
                 <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />

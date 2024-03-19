@@ -22,7 +22,7 @@ namespace Athanasia.Data
         public DbSet<Opinion> Opiniones { get; set; }
         public DbSet<OpinionesLibros> OpinionesLibros { get; set; }
         public DbSet<Pedido> Pedidos { get; set; }
-        public DbSet<PedidosProductos> PedidosProductos { get; set; }
+        public DbSet<PedidoProducto> PedidosProductos { get; set; }
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Rol> Roles { get; set; }
         public DbSet<Saga> Sagas { get; set; }
@@ -32,5 +32,7 @@ namespace Athanasia.Data
         public DbSet<ProductoSimpleView> ProductosSimplesView { get; set; }
         public DbSet<FormatoLibroView> FormatosLibroView { get; set; }
         public DbSet<InformacionCompraView> InformacionesCompraView { get; set; }
+        public DbSet<PedidoView> PedidosView { get; set; }
+        public DbSet<PedidoProductoView> PedidosProductoView { get; set; }
     }
 }

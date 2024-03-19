@@ -38,10 +38,27 @@ namespace Athanasia.Controllers
         [HttpPost]
         public async Task<IActionResult> Comprar(int idinfocompra)
         {
-            //AQUI ME HE QUEDAO
+            int idusuario = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
             List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
-            Pedido pedido = await this.repo.InsertPedidoAsync();
-            return View();
+            if (productos != null)
+            {
+                Pedido pedido = await this.repo.InsertPedidoAsync(idusuario);
+                await this.repo.InsertListPedidoProductosAsync(pedido.IdPedido, productos);
+                this.memoryCache.Remove("CARRITO");
+            }
+            return RedirectToAction("HistorialCompras", "Usuario");
+        }
+        [AuthorizeUsuarios]
+        public async Task<IActionResult> CancelarPedido(int idpedido)
+        {
+            await this.repo.UpdatePedidoEstadoCancelarAsync(idpedido);
+            return RedirectToAction("HistorialCompras", "Usuario");
+        }
+        [AuthorizeUsuarios]
+        public async Task<IActionResult> Detalles(int idpedido)
+        {
+            List<PedidoProductoView> prodPedido = await this.repo.GetPedidoProductoViewsByIdPedidoAsync(idpedido);
+            return View(prodPedido);
         }
     }
 }
