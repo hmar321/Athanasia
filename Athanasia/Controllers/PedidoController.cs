@@ -25,10 +25,9 @@ namespace Athanasia.Controllers
         {
             int idusuario = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
             List<InformacionCompraView> infoUsuario = await this.repo.GetAllInformacionCompraViewByIdUsuarioAsync(idusuario);
-            if (infoUsuario == null)
+            if (infoUsuario.Count == 0)
             {
-                ViewData["MENSAJE"] = "No tienes métodos de pago";
-                return View("MetodosPago");
+                return RedirectToAction("MetodosPago","Usuario");
             }
             ViewData["INFOCOMPRAUSUARIO"] = infoUsuario;
             return View();

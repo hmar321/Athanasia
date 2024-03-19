@@ -719,10 +719,6 @@ namespace Athanasia.Repositories
 
         public async Task<List<InformacionCompraView>> GetAllInformacionCompraViewByIdUsuarioAsync(int idusuario)
         {
-            if (this.context.InformacionesCompraView == null)
-            {
-                return new List<InformacionCompraView>();
-            }
             return await this.context.InformacionesCompraView.Where(dp => dp.IdUsuario == idusuario).ToListAsync();
         }
         #endregion
@@ -745,7 +741,7 @@ namespace Athanasia.Repositories
             }
             else
             {
-                nextid = this.context.Pedidos.Max(o => o.IdPedido);
+                nextid = this.context.Pedidos.Max(o => o.IdPedido)+1;
             }
             return nextid;
         }
