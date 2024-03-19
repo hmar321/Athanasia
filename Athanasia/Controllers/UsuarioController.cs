@@ -56,7 +56,7 @@ namespace Athanasia.Controllers
             }
             Usuario usuario = await this.repo.RegistrarUsuarioAsync(nombre, apellido, email, password);
             string serverUrl = this.helperPathProvider.MapUrlServerPath();
-            serverUrl = serverUrl + "/Usuario/Login?token=" + usuario.Token;
+            serverUrl = serverUrl + "/Managed/Login?token=" + usuario.Token;
             string mensaje = "<h3>Usuario registrado<h3>";
             mensaje += "<p>Puede activar su cuenta pulsando el siguiente enlace:</p>";
             mensaje += "<a href='" + serverUrl + "'>" + serverUrl + "</a>";

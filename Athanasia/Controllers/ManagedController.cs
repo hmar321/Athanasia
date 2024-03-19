@@ -22,6 +22,7 @@ namespace Athanasia.Controllers
             if (token!=null)
             {
                 await this.repo.ActivarUsuarioAsync(token);
+                ViewData["MENSAJE"] = "Usuario activado";
             }
             return View();
         }
