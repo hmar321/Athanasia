@@ -47,6 +47,7 @@ namespace Athanasia.Controllers
             }
             return RedirectToAction("HistorialCompras", "Usuario");
         }
+
         [AuthorizeUsuarios]
         public async Task<IActionResult> CancelarPedido(int idpedido)
         {
