@@ -1,9 +1,11 @@
 using Athanasia.Data;
 using Athanasia.Helpers;
 using Athanasia.Repositories;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +33,7 @@ builder.Services.AddControllersWithViews
     .AddSessionStateTempDataProvider();
 builder.Services.AddTransient<HelperPathProvider>();
 builder.Services.AddTransient<HelperMails>();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddMemoryCache();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();

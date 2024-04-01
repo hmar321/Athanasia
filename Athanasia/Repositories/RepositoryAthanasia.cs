@@ -606,12 +606,14 @@ namespace Athanasia.Repositories
 
         }
 
-        public async Task<int> InsertListPedidoProductosAsync(int idpedido, List<ProductoSimpleView> productos)
+        public async Task<int> InsertListPedidoProductosAsync(int idpedido, List<PedidoProducto> productos)
         {
             int nextId = GetPedidoProductoNextId();
-            foreach (ProductoSimpleView prod in productos)
+            foreach (PedidoProducto prod in productos)
             {
-                await this.context.PedidosProductos.AddAsync(new PedidoProducto { IdPedidoProducto = nextId, Unidades = prod.Unidades, IdPedido = idpedido, IdProducto = prod.IdProducto });
+                prod.IdPedidoProducto = nextId;
+                prod.IdPedido = idpedido;
+                await this.context.PedidosProductos.AddAsync(prod);
                 nextId++;
             }
             return await this.context.SaveChangesAsync();

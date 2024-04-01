@@ -3,8 +3,10 @@ using Athanasia.Filters;
 using Athanasia.Models.Tables;
 using Athanasia.Models.Views;
 using Athanasia.Repositories;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace Athanasia.Controllers
@@ -13,11 +15,13 @@ namespace Athanasia.Controllers
     {
         private RepositoryAthanasia repo;
         private IMemoryCache memoryCache;
+        private IMapper mapper;
 
-        public PedidoController(RepositoryAthanasia repo, IMemoryCache memoryCache)
+        public PedidoController(RepositoryAthanasia repo, IMemoryCache memoryCache,IMapper mapper)
         {
             this.repo = repo;
             this.memoryCache = memoryCache;
+            this.mapper = mapper;
         }
 
         [AuthorizeUsuarios]
@@ -38,10 +42,11 @@ namespace Athanasia.Controllers
         public async Task<IActionResult> Comprar(int idinfocompra)
         {
             int idusuario = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
-            if (productos != null)
+            List<ProductoSimpleView> productosView = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
+            if (productosView != null)
             {
                 Pedido pedido = await this.repo.InsertPedidoAsync(idusuario);
+                List<PedidoProducto> productos=this.mapper.Map<List<PedidoProducto>>(productosView);
                 await this.repo.InsertListPedidoProductosAsync(pedido.IdPedido, productos);
                 this.memoryCache.Remove("CARRITO");
             }
