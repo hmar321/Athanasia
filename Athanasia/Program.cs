@@ -31,12 +31,12 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddControllersWithViews
     (options => options.EnableEndpointRouting = false)
     .AddSessionStateTempDataProvider();
-builder.Services.AddTransient<HelperPathProvider>();
-builder.Services.AddTransient<HelperMails>();
-builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddMemoryCache();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
+builder.Services.AddTransient<HelperPathProvider>();
+builder.Services.AddTransient<HelperMails>();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddTransient<IRepositoryAthanasia, RepositoryAthanasia>();
 string connectionString = builder.Configuration.GetConnectionString("SqlServerAzure");
 builder.Services.AddDbContext<AthanasiaContext>(
