@@ -37,8 +37,8 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddMemoryCache();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
-builder.Services.AddTransient<RepositoryAthanasia>();
-string connectionString = builder.Configuration.GetConnectionString("SqlServerAthanasia");
+builder.Services.AddTransient<IRepositoryAthanasia, RepositoryAthanasia>();
+string connectionString = builder.Configuration.GetConnectionString("SqlServerAzure");
 builder.Services.AddDbContext<AthanasiaContext>(
     options => options.UseSqlServer(connectionString)
     );

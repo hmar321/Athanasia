@@ -322,13 +322,9 @@ using System.Diagnostics.Metrics;
 //go
 #endregion
 
-
-#region
-#endregion
-
 namespace Athanasia.Repositories
 {
-    public class RepositoryAthanasia
+    public class RepositoryAthanasia : IRepositoryAthanasia
     {
         private AthanasiaContext context;
 
@@ -743,7 +739,7 @@ namespace Athanasia.Repositories
             }
             else
             {
-                nextid = this.context.Pedidos.Max(o => o.IdPedido)+1;
+                nextid = this.context.Pedidos.Max(o => o.IdPedido) + 1;
             }
             return nextid;
         }
@@ -783,8 +779,6 @@ namespace Athanasia.Repositories
             return await this.context.PedidosProductoView.Where(p => p.IdPedido == idpedido).ToListAsync();
         }
 
-        #endregion
-        #region 
         #endregion
 
     }

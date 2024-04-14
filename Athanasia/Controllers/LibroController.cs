@@ -9,10 +9,10 @@ namespace Athanasia.Controllers
 {
     public class LibroController : Controller
     {
-        private RepositoryAthanasia repo;
+        private IRepositoryAthanasia repo;
         private IMemoryCache memoryCache;
 
-        public LibroController(RepositoryAthanasia repo, IMemoryCache memoryCache)
+        public LibroController(IRepositoryAthanasia repo, IMemoryCache memoryCache)
         {
             this.repo = repo;
             this.memoryCache = memoryCache;

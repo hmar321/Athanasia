@@ -13,11 +13,11 @@ namespace Athanasia.Controllers
 {
     public class PedidoController : Controller
     {
-        private RepositoryAthanasia repo;
+        private IRepositoryAthanasia repo;
         private IMemoryCache memoryCache;
         private IMapper mapper;
 
-        public PedidoController(RepositoryAthanasia repo, IMemoryCache memoryCache,IMapper mapper)
+        public PedidoController(IRepositoryAthanasia repo, IMemoryCache memoryCache,IMapper mapper)
         {
             this.repo = repo;
             this.memoryCache = memoryCache;
@@ -37,7 +37,9 @@ namespace Athanasia.Controllers
             return View();
 
         }
+        
         [AuthorizeUsuarios]
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> Comprar(int idinfocompra)
         {

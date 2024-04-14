@@ -10,9 +10,9 @@ namespace Athanasia.Controllers
 {
     public class ManagedController : Controller
     {
-        private RepositoryAthanasia repo;
+        private IRepositoryAthanasia repo;
 
-        public ManagedController(RepositoryAthanasia repo)
+        public ManagedController(IRepositoryAthanasia repo)
         {
             this.repo = repo;
         }

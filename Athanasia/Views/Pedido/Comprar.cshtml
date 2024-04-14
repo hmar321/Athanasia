@@ -10,6 +10,7 @@
 <div class="card bg-light p-4">
     <h1>Comprar</h1>
     <form method="post">
+        @Html.AntiForgeryToken()
         <label>Selecciona un método de pago</label>
         <select name="metodopago" class="form-select mb-3" style="width:20rem;">
             @foreach (InformacionCompraView ic in metodosPago)

@@ -14,12 +14,12 @@ namespace Athanasia.Controllers
 {
     public class UsuarioController : Controller
     {
-        private RepositoryAthanasia repo;
+        private IRepositoryAthanasia repo;
         private IMemoryCache memoryCache;
         private HelperMails helperMail;
         private HelperPathProvider helperPathProvider;
 
-        public UsuarioController(RepositoryAthanasia repo, IMemoryCache memoryCache, HelperMails helperMail, HelperPathProvider helperPathProvider)
+        public UsuarioController(IRepositoryAthanasia repo, IMemoryCache memoryCache, HelperMails helperMail, HelperPathProvider helperPathProvider)
         {
             this.repo = repo;
             this.memoryCache = memoryCache;
