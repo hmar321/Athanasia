@@ -94,21 +94,22 @@ using System.Diagnostics.Metrics;
 //inner join PRODUCTO p on l.ID_LIBRO=p.ID_LIBRO and p.PRECIO is not null
 //inner join FORMATO f on p.ID_FORMATO=f.ID_FORMATO and f.NOMBRE is not null
 
-//create view V_PEDIDO_PRODUCTOS as
-// select 
-//	pp.ID_PEDIDO_PRODUCTO,
-//   p.ID_PEDIDO,
-//   l.TITULO,
-//   f.NOMBRE FORMATO,
-//   pp.UNIDADES,
-//   pr.PRECIO,
-//   ep.NOMBRE ESTADO_PEDIDO
-//from PEDIDO p
-//inner join ESTADO_PEDIDO ep on p.ID_ESTADO_PEDIDO=ep.ID_ESTADO_PEDIDO
-//inner join PEDIDOS_PRODUCTOS pp on p.ID_PEDIDO=pp.ID_PEDIDO
-//inner join PRODUCTO pr on pr.ID_PRODUCTO=pr.ID_PRODUCTO
-//inner join FORMATO f on pr.ID_FORMATO=f.ID_FORMATO
-//inner join LIBRO l on pr.ID_LIBRO=l.ID_LIBRO
+//alter view V_PEDIDO_PRODUCTO as
+//select        
+//ISNULL(pp.ID_PEDIDO_PRODUCTO, - 1) ID_PEDIDO_PRODUCTO,
+//l.ID_LIBRO, l.TITULO, l.PORTADA,
+//ISNULL(a.NOMBRE, 'Desconocido') AUTOR,
+//p.ID_FORMATO,
+//f.NOMBRE FORMATO,
+//pp.UNIDADES,
+//p.PRECIO,
+//pp.ID_PEDIDO,
+//pp.ID_PRODUCTO
+//from PEDIDOS_PRODUCTOS pp 
+//INNER JOIN PRODUCTO p ON pp.ID_PRODUCTO = p.ID_PRODUCTO 
+//INNER JOIN FORMATO f ON p.ID_FORMATO = f.ID_FORMATO 
+//INNER JOIN LIBRO l ON p.ID_LIBRO = l.ID_LIBRO 
+//LEFT OUTER JOIN AUTOR a ON l.ID_AUTOR = a.ID_AUTOR
 
 //create view V_PRODUCTO_BUSCADO as
 //select
