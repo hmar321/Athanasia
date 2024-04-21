@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.Data;
 using System.Diagnostics.Metrics;
 
@@ -603,13 +604,14 @@ namespace Athanasia.Repositories
 
         }
 
-        public async Task<int> InsertListPedidoProductosAsync(int idpedido, List<PedidoProducto> productos)
+        public async Task<int> InsertListPedidoProductosAsync(int idusuario, List<PedidoProducto> productos)
         {
+            Pedido pedido = await this.InsertPedidoAsync(idusuario);
             int nextId = GetPedidoProductoNextId();
             foreach (PedidoProducto prod in productos)
             {
                 prod.IdPedidoProducto = nextId;
-                prod.IdPedido = idpedido;
+                prod.IdPedido = pedido.IdPedido;
                 await this.context.PedidosProductos.AddAsync(prod);
                 nextId++;
             }
@@ -782,5 +784,14 @@ namespace Athanasia.Repositories
 
         #endregion
 
+        public async Task<string> AuthTokenAsync(string email, string password)
+        {
+            return null;
+        }
+
+        public Task<Usuario> AuthGetUsuarioAsync(string token)
+        {
+            return null;
+        }
     }
 }

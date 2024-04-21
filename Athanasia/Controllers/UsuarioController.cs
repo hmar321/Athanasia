@@ -106,9 +106,7 @@ namespace Athanasia.Controllers
                 }
                 imagen = fichero.FileName;
             }
-            Usuario usuario = await this.repo.UpdateUsuarioAsync(idusuario, nombre, apellido, email, imagen);
-            //editar los claims cuando no me de error lo del fichero del formulario
-
+            await this.repo.UpdateUsuarioAsync(idusuario, nombre, apellido, email, imagen);
             return RedirectToAction("Logout", "Managed");
         }
 

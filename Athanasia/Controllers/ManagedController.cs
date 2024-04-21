@@ -19,7 +19,7 @@ namespace Athanasia.Controllers
 
         public async Task<IActionResult> Login(string? token)
         {
-            if (token!=null)
+            if (token != null)
             {
                 await this.repo.ActivarUsuarioAsync(token);
                 ViewData["MENSAJE"] = "Usuario activado";
@@ -29,9 +29,11 @@ namespace Athanasia.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
-            Usuario usuario = await this.repo.LogInUserAsync(email, password);
-            if (usuario != null)
+            //Usuario usuario = await this.repo.LogInUserAsync(email, password);
+            string token = await this.repo.AuthTokenAsync(email, password);
+            if (token != null)
             {
+                Usuario usuario = await this.repo.AuthGetUsuarioAsync(token);
                 ClaimsIdentity identity = new ClaimsIdentity(
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     ClaimTypes.Name,
@@ -43,7 +45,8 @@ namespace Athanasia.Controllers
                     new Claim(ClaimTypes.Surname, usuario.Apellido),
                     new Claim(ClaimTypes.Email, usuario.Email),
                     new Claim(ClaimTypes.Role, usuario.IdRol+""),
-                    new Claim(ClaimTypes.UserData, usuario.Imagen)
+                    new Claim(ClaimTypes.UserData, usuario.Imagen),
+                    new Claim("TOKENJWT",token)
                 };
                 identity.AddClaims(claims);
                 ClaimsPrincipal usePrincipal = new ClaimsPrincipal(identity);

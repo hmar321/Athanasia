@@ -26,7 +26,7 @@ namespace Athanasia.Controllers
             }
             if (busqueda==null)
             {
-                busqueda = "";
+                busqueda = " ";
             }
             int ndatos = 4;
             PaginacionModel<ProductoSimpleView> model = await this.repo.GetAllProductoSimpleViewSearchPaginacionAsync(busqueda, posicion.Value, ndatos);

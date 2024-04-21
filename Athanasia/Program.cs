@@ -1,6 +1,7 @@
 using Athanasia.Data;
 using Athanasia.Helpers;
 using Athanasia.Repositories;
+using Athanasia.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Features;
@@ -17,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 //        policy => policy.RequireClaim("Administrador"));
 //});
 builder.Services.AddAntiforgery();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultSignInScheme =
@@ -37,7 +39,7 @@ builder.Services.AddSession();
 builder.Services.AddTransient<HelperPathProvider>();
 builder.Services.AddTransient<HelperMails>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
-builder.Services.AddTransient<IRepositoryAthanasia, RepositoryAthanasia>();
+builder.Services.AddTransient<IRepositoryAthanasia, ServiceAthanasia>();
 string connectionString = builder.Configuration.GetConnectionString("SqlServerAzure");
 builder.Services.AddDbContext<AthanasiaContext>(
     options => options.UseSqlServer(connectionString)

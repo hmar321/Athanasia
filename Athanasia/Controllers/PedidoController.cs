@@ -47,9 +47,8 @@ namespace Athanasia.Controllers
             List<ProductoSimpleView> productosView = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
             if (productosView != null)
             {
-                Pedido pedido = await this.repo.InsertPedidoAsync(idusuario);
                 List<PedidoProducto> productos=this.mapper.Map<List<PedidoProducto>>(productosView);
-                await this.repo.InsertListPedidoProductosAsync(pedido.IdPedido, productos);
+                await this.repo.InsertListPedidoProductosAsync(idusuario, productos);
                 this.memoryCache.Remove("CARRITO");
             }
             return RedirectToAction("HistorialCompras", "Usuario");

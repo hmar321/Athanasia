@@ -75,7 +75,7 @@ namespace Athanasia.Controllers
             }
             if (busqueda == null)
             {
-                busqueda = "";
+                busqueda = " ";
             }
             if (posicion == null)
             {
@@ -115,7 +115,7 @@ namespace Athanasia.Controllers
             }
             if (busqueda == null)
             {
-                busqueda = "";
+                busqueda = " ";
             }
             int posicion = 1;
             int ndatos = 4;
