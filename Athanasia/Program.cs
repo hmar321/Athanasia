@@ -2,11 +2,8 @@ using Athanasia.Data;
 using Athanasia.Helpers;
 using Athanasia.Repositories;
 using Athanasia.Services;
-using AutoMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
