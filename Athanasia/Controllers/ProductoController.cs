@@ -2,9 +2,11 @@
 using Athanasia.Models.Util;
 using Athanasia.Models.Views;
 using Athanasia.Repositories;
+using Athanasia.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace Athanasia.Controllers
 {
@@ -12,11 +14,13 @@ namespace Athanasia.Controllers
     {
         private IRepositoryAthanasia repo;
         private IMemoryCache memoryCache;
+        private ServiceCacheRedis serviceRedis;
 
-        public ProductoController(IRepositoryAthanasia repo, IMemoryCache memoryCache)
+        public ProductoController(IRepositoryAthanasia repo, IMemoryCache memoryCache, ServiceCacheRedis serviceRedis)
         {
             this.repo = repo;
             this.memoryCache = memoryCache;
+            this.serviceRedis = serviceRedis;
         }
 
         public async Task<IActionResult> Carrito()
@@ -24,37 +28,64 @@ namespace Athanasia.Controllers
             return View();
         }
 
-        public IActionResult _Precio(int idproducto, int? valor)
+        public async Task<IActionResult> _Precio(int idproducto, int? valor)
         {
-            List<ProductoSimpleView> productos = memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
-            ProductoSimpleView producto = productos.FirstOrDefault(p => p.IdProducto == idproducto);
-            if (valor != null)
+            ProductoSimpleView producto;
+            if (HttpContext.User.Identity.IsAuthenticated == false)
             {
-                producto.Unidades += valor.Value;
-                if (producto.Unidades < 1)
+                List<ProductoSimpleView> productos = memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
+                producto = productos.FirstOrDefault(p => p.IdProducto == idproducto);
+                if (valor != null)
                 {
-                    productos.Remove(producto);
-                }
-                if (productos.Count == 0)
-                {
-                    memoryCache.Remove("CARRITO");
+                    producto.Unidades += valor.Value;
+                    if (producto.Unidades < 1)
+                    {
+                        productos.Remove(producto);
+                    }
+                    if (productos.Count == 0)
+                    {
+                        memoryCache.Remove("CARRITO");
+                    }
                 }
             }
+            else
+            {
+                string idusuario = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                List<ProductoSimpleView> productos = await this.serviceRedis.GetProductosFavoritosAsync(idusuario);
+                producto = productos.FirstOrDefault(p => p.IdProducto == idproducto);
+                if (valor != null)
+                {
+                    producto.Unidades += valor.Value;
+                    if (producto.Unidades < 1)
+                    {
+                        await this.serviceRedis.RemoveProductoFavoritoAsync(idusuario, producto.IdProducto);
+                    }
+                }
+            }
+
             return PartialView("_Precio", producto);
         }
 
         public async Task<IActionResult> QuitarProductoCarrito(int idproducto)
         {
-            List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
-            ProductoSimpleView producto = productos.FirstOrDefault(prod => prod.IdProducto == idproducto);
-            productos.Remove(producto);
-            if (productos.Count == 0)
+            if (HttpContext.User.Identity.IsAuthenticated==false)
             {
-                this.memoryCache.Remove("CARRITO");
+                List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
+                ProductoSimpleView producto = productos.FirstOrDefault(prod => prod.IdProducto == idproducto);
+                productos.Remove(producto);
+                if (productos.Count == 0)
+                {
+                    this.memoryCache.Remove("CARRITO");
+                }
+                else
+                {
+                    this.memoryCache.Set("CARRITO", productos);
+                }
             }
             else
             {
-                this.memoryCache.Set("CARRITO", productos);
+                string idusuario = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                await this.serviceRedis.RemoveProductoFavoritoAsync(idusuario,idproducto);
             }
             return RedirectToAction("Carrito");
         }

@@ -1,6 +1,7 @@
 ﻿@model List<PedidoProductoView>
 @{
     double precioTotal = 0;
+    string urlOrigen = helperPaths.GetStorageBlob("portadas");
 }
 <div class="card bg-light p-4">
     <h3>Detalles pedido</h3>
@@ -22,7 +23,7 @@
                 precioTotal += prod.Precio * prod.Unidades;
                 <tr>
                     <td class="text-center">
-                        <img src="~/images/portadas/@prod.Portada" class="rounded" style="width:5rem;height:7rem;" />
+                        <img src="@(urlOrigen+prod.Portada)" class="rounded" style="width:5rem;height:7rem;" />
                     </td>
                     <td class="text-center align-middle">
                         @prod.Titulo

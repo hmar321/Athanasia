@@ -5,6 +5,8 @@ using Athanasia.Models.Tables;
 using Athanasia.Models.Util;
 using Athanasia.Models.Views;
 using Athanasia.Repositories;
+using Athanasia.Services;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System.Security.Claims;
@@ -15,16 +17,16 @@ namespace Athanasia.Controllers
     public class UsuarioController : Controller
     {
         private IRepositoryAthanasia repo;
-        private IMemoryCache memoryCache;
         private HelperMails helperMail;
         private HelperPathProvider helperPathProvider;
+        private ServiceStorageBlobs serviceStorageBlobs;
 
-        public UsuarioController(IRepositoryAthanasia repo, IMemoryCache memoryCache, HelperMails helperMail, HelperPathProvider helperPathProvider)
+        public UsuarioController(IRepositoryAthanasia repo, HelperMails helperMail, HelperPathProvider helperPathProvider, ServiceStorageBlobs serviceStorageBlobs)
         {
             this.repo = repo;
-            this.memoryCache = memoryCache;
             this.helperMail = helperMail;
             this.helperPathProvider = helperPathProvider;
+            this.serviceStorageBlobs = serviceStorageBlobs;
         }
 
         public IActionResult Terminos()
@@ -99,12 +101,13 @@ namespace Athanasia.Controllers
             string imagen = null;
             if (fichero != null)
             {
-                string path = this.helperPathProvider.MapPath(fichero.FileName, FoldersImages.Usuarios);
-                using (Stream stream = new FileStream(path, FileMode.Create))
-                {
-                    await fichero.CopyToAsync(stream);
-                }
+                //string path = this.helperPathProvider.MapPath(fichero.FileName, FoldersImages.Usuarios);
+                //using (Stream stream = new FileStream(path, FileMode.Create))
+                //{
+                //    await fichero.CopyToAsync(stream);
+                //}
                 imagen = fichero.FileName;
+                this.serviceStorageBlobs.UploadBlobAsync("usuarios", imagen,fichero.OpenReadStream());
             }
             await this.repo.UpdateUsuarioAsync(idusuario, nombre, apellido, email, imagen);
             return RedirectToAction("Logout", "Managed");

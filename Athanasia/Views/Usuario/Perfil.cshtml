@@ -4,6 +4,7 @@
     string apellido = Context.User.FindFirst(ClaimTypes.Surname).Value;
     string email = Context.User.FindFirst(ClaimTypes.Email).Value;
     string imagen = Context.User.FindFirst(ClaimTypes.UserData).Value;
+    string urlOrigen = helperPaths.GetStorageBlob("usuarios");
 }
 <div class="card bg-light p-5">
     <h1 class="text-primary">
@@ -12,7 +13,7 @@
         </svg>
         Perfil
     </h1>
-    <img src="~/Images/Usuarios/@imagen" class="rounded" style="width:20rem;height:20rem;" />
+    <img src="@(urlOrigen+imagen)" class="rounded" style="width:20rem;height:20rem;" />
     <h4>@nombre @apellido</h4>
     <hr />
     <dl class="row">

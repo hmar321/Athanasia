@@ -3,6 +3,7 @@
     int posicion = (int)ViewData["POSICION"];
     int paginas = (int)ViewData["PAGINAS"];
     string busqueda = ViewData["BUSQUEDA"].ToString();
+    string urlOrigen = helperPaths.GetStorageBlob("portadas");
 }
 @section scripts {
     <script>
@@ -55,7 +56,7 @@
         @foreach (ProductoSimpleView libro in Model)
         {
             <div class="card" style="width:22.15rem">
-                <img src="~/images/portadas/@libro.Portada" class="card-img-top" style="height:30rem;width:22rem;">
+                <img src="@(urlOrigen+libro.Portada)" class="card-img-top" style="height:30rem;width:22rem;">
                 <div class="card-body d-flex flex-column bg-light" style="height:9rem">
                     <div class="d-flex justify-content-between mt-auto">
                         <h5 class="card-title" style="max-width:20rem;">@libro.Titulo</h5>

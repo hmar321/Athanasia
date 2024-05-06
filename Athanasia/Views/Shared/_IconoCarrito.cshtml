@@ -1,6 +1,15 @@
 ﻿@{
     int idproducto = (int)ViewData["IDPRODUCTO"];
-    List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
+    List<ProductoSimpleView> productos;
+    if (Context.User.Identity.IsAuthenticated == false)
+    {
+        productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
+    }
+    else
+    {
+        string idusuario = Context.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+        productos = await this.serviceRedis.GetProductosFavoritosAsync(idusuario);
+    }
     if (productos == null)
     {
         productos = new List<ProductoSimpleView>();

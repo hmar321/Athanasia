@@ -1,4 +1,8 @@
-﻿@if (Context.User.Identity.IsAuthenticated == false)
+﻿@{
+    string urlOrigen = helperPaths.GetStorageBlob("usuarios");
+}
+
+@if (Context.User.Identity.IsAuthenticated == false)
 {
     <li class="nav-item dropdown">
         <a class="nav-link text-light dropdown-toggle d-flex flex-row align-items-center gap-1" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -22,7 +26,7 @@ else
 {
     <li class="nav-item dropdown">
         <a class="nav-link text-light dropdown-toggle d-flex flex-row align-items-center gap-1" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="~/images/usuarios/@Context.User.FindFirst(ClaimTypes.UserData).Value" class="rounded" style="width:3rem;height:3rem;" />
+            <img src="@(urlOrigen+Context.User.FindFirst(ClaimTypes.UserData).Value)" class="rounded" style="width:3rem;height:3rem;" />
             Usuario
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">

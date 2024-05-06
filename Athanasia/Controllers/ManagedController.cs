@@ -5,16 +5,23 @@ using System.Security.Claims;
 using Athanasia.Repositories;
 using Athanasia.Models.Tables;
 using Athanasia.Extension;
+using Microsoft.Extensions.Caching.Memory;
+using Athanasia.Services;
+using Athanasia.Models.Views;
 
 namespace Athanasia.Controllers
 {
     public class ManagedController : Controller
     {
         private IRepositoryAthanasia repo;
+        private IMemoryCache memoryCache;
+        private ServiceCacheRedis serviceRedis;
 
-        public ManagedController(IRepositoryAthanasia repo)
+        public ManagedController(IRepositoryAthanasia repo, IMemoryCache memoryCache, ServiceCacheRedis serviceRedis)
         {
             this.repo = repo;
+            this.memoryCache = memoryCache;
+            this.serviceRedis = serviceRedis;
         }
 
         public async Task<IActionResult> Login(string? token)
@@ -34,6 +41,12 @@ namespace Athanasia.Controllers
             if (token != null)
             {
                 Usuario usuario = await this.repo.AuthGetUsuarioAsync(token);
+                List<ProductoSimpleView> productosCarrito = memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
+                if (productosCarrito!=null)
+                {
+                    await this.serviceRedis.AddMultipleFavoritos(usuario.IdUsuario + "", productosCarrito);
+                }
+                memoryCache.Remove("CARRITO");
                 ClaimsIdentity identity = new ClaimsIdentity(
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     ClaimTypes.Name,
@@ -53,8 +66,13 @@ namespace Athanasia.Controllers
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     usePrincipal);
-                string controller = TempData["controller"].ToString();
-                string action = TempData["action"].ToString();
+                string controller = "Libro";
+                string action = "Index";
+                if (TempData["controller"] != null && TempData["action"] != null)
+                {
+                    controller = TempData["controller"].ToString();
+                    action = TempData["action"].ToString();
+                }
                 return RedirectToAction(action, controller);
             }
             else

@@ -1,7 +1,17 @@
 ﻿@{
-    List<ProductoSimpleView> productos = memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
+    List<ProductoSimpleView> productos;
+    if (Context.User.Identity.IsAuthenticated == false)
+    {
+        productos = memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
+    }
+    else
+    {
+        string idusuario = Context.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+        productos = await serviceRedis.GetProductosFavoritosAsync(idusuario);
+    }
     double precioTotal = 0;
     double precioVarios = 0;
+    string urlOrigen = helperPaths.GetStorageBlob("portadas");
 }
 @section scripts {
     <script>
@@ -63,7 +73,7 @@
                 <tr>
                     <td colspan="2">
                         <div class="d-flex flex-wrap">
-                            <img src="~/images/portadas/@producto.Portada" class="rounded" style="height:20rem;width:13rem;">
+                            <img src="@(urlOrigen+producto.Portada)" class="rounded" style="height:20rem;width:13rem;">
 
                             <div class="d-flex flex-column gap-3 m-4">
                                 <a class="text-decoration-none" asp-controller="Libro" asp-action="Detalles" asp-route-idproducto="@producto.IdProducto">

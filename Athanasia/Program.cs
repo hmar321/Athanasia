@@ -2,18 +2,13 @@ using Athanasia.Data;
 using Athanasia.Helpers;
 using Athanasia.Repositories;
 using Athanasia.Services;
+using Azure.Security.KeyVault.Secrets;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
-
-//builder.Services.AddAuthorization(options =>
-//{
-//    options.AddPolicy("PERMISOSELEVADOS",
-//        policy => policy.RequireRole("Psiquiatría", "Cardiología"));
-//    options.AddPolicy("ADMIN",
-//        policy => policy.RequireClaim("Administrador"));
-//});
 builder.Services.AddAntiforgery();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(options =>
@@ -33,6 +28,18 @@ builder.Services.AddControllersWithViews
 builder.Services.AddMemoryCache();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
+
+
+builder.Services.AddAzureClients(factory =>
+{
+    factory.AddSecretClient(builder.Configuration.GetSection("KeyVault"));
+});
+SecretClient secretClient = builder.Services.BuildServiceProvider().GetService<SecretClient>();
+KeyVaultSecret storagekey = await secretClient.GetSecretAsync("StorageAccount");
+BlobServiceClient blobServiceClient = new BlobServiceClient(storagekey.Value);
+builder.Services.AddTransient<BlobServiceClient>(x => blobServiceClient);
+builder.Services.AddTransient<ServiceStorageBlobs>();
+builder.Services.AddTransient<ServiceCacheRedis>();
 builder.Services.AddTransient<HelperPathProvider>();
 builder.Services.AddTransient<HelperMails>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));

@@ -4,6 +4,7 @@ using Athanasia.Models.Tables;
 using Athanasia.Models.Util;
 using Athanasia.Models.Views;
 using Athanasia.Repositories;
+using Azure.Security.KeyVault.Secrets;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NuGet.Common;
@@ -18,9 +19,10 @@ namespace Athanasia.Services
         private MediaTypeWithQualityHeaderValue header;
         private IHttpContextAccessor httpContextAccesor;
 
-        public ServiceAthanasia(IConfiguration config, IHttpContextAccessor httpContext)
+        public ServiceAthanasia(SecretClient secretClient, IHttpContextAccessor httpContext)
         {
-            this.UrlApi = config.GetValue<string>("ApiUrls:ApiAthanasia");
+            KeyVaultSecret urlApiAthanasia = secretClient.GetSecret("ApiAthanasia");
+            this.UrlApi = urlApiAthanasia.Value;
             this.header = new MediaTypeWithQualityHeaderValue("application/json");
             this.httpContextAccesor = httpContext;
         }
@@ -563,13 +565,11 @@ namespace Athanasia.Services
         public async Task<Usuario> ActivarUsuarioAsync(string tokenmail)
         {
             string request = "api/Usuarios/ActivarUsuario/" + tokenmail;
-            string token = httpContextAccesor.HttpContext.User.FindFirst("TOKENJWT").Value;
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(this.UrlApi);
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Accept.Add(this.header);
-                client.DefaultRequestHeaders.Add("authorization", "bearer " + token);
                 HttpResponseMessage response = await client.PutAsync(request, null);
                 if (response.IsSuccessStatusCode)
                 {

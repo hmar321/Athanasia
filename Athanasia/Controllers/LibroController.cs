@@ -2,8 +2,10 @@
 using Athanasia.Models.Util;
 using Athanasia.Models.Views;
 using Athanasia.Repositories;
+using Athanasia.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using System.Security.Claims;
 
 namespace Athanasia.Controllers
 {
@@ -11,11 +13,13 @@ namespace Athanasia.Controllers
     {
         private IRepositoryAthanasia repo;
         private IMemoryCache memoryCache;
+        private ServiceCacheRedis serviceRedis;
 
-        public LibroController(IRepositoryAthanasia repo, IMemoryCache memoryCache)
+        public LibroController(IRepositoryAthanasia repo, IMemoryCache memoryCache, ServiceCacheRedis serviceRedis)
         {
             this.repo = repo;
             this.memoryCache = memoryCache;
+            this.serviceRedis = serviceRedis;
         }
 
         public async Task<ActionResult> Index(int? posicion, string? busqueda)
@@ -24,7 +28,7 @@ namespace Athanasia.Controllers
             {
                 posicion = 1;
             }
-            if (busqueda==null)
+            if (busqueda == null)
             {
                 busqueda = " ";
             }
@@ -58,18 +62,32 @@ namespace Athanasia.Controllers
 
         public async Task<IActionResult> _IconoCarrito(int idproducto, bool agregar)
         {
-            List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
-            if (agregar == true)
+
+            if (HttpContext.User.Identity.IsAuthenticated == false)
             {
-                if (productos == null)
+                List<ProductoSimpleView> productos = this.memoryCache.Get<List<ProductoSimpleView>>("CARRITO");
+                if (agregar == true)
                 {
-                    productos = new List<ProductoSimpleView>();
+                    if (productos == null)
+                    {
+                        productos = new List<ProductoSimpleView>();
+                    }
+                    if (productos.Any(id => id.IdProducto == idproducto) == false)
+                    {
+                        ProductoSimpleView producto = await this.repo.GetProductoSimpleByIdAsync(idproducto);
+                        productos.Add(producto);
+                        this.memoryCache.Set("CARRITO", productos);
+                    }
                 }
-                if (productos.Any(id => id.IdProducto == idproducto) == false)
+            }
+            else
+            {
+                string idusuario = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                List<ProductoSimpleView> productos = await this.serviceRedis.GetProductosFavoritosAsync(idusuario);
+                if (agregar == true)
                 {
                     ProductoSimpleView producto = await this.repo.GetProductoSimpleByIdAsync(idproducto);
-                    productos.Add(producto);
-                    this.memoryCache.Set("CARRITO", productos);
+                    await this.serviceRedis.AddProductoFavoritoAsync(idusuario, producto);
                 }
             }
             ViewData["IDPRODUCTO"] = idproducto;
