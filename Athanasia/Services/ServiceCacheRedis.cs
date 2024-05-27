@@ -66,6 +66,13 @@ namespace Athanasia.Services
             }
         }
 
+        public async Task SaveProductosFavoritoAsync(string idusuario, List<ProductoSimpleView> productos)
+        {
+            string jsonProductos = JsonConvert.SerializeObject(productos);
+            await this.database.StringSetAsync(idusuario, jsonProductos);
+
+        }
+
         public async Task<List<ProductoSimpleView>> GetProductosFavoritosAsync(string idusuario)
         {
             string jsonProductos = await this.database.StringGetAsync(idusuario);

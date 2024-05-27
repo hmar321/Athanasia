@@ -60,6 +60,10 @@ namespace Athanasia.Controllers
                     {
                         await this.serviceRedis.RemoveProductoFavoritoAsync(idusuario, producto.IdProducto);
                     }
+                    else
+                    {
+                        await this.serviceRedis.SaveProductosFavoritoAsync(idusuario, productos);
+                    }
                 }
             }
 
